@@ -1,0 +1,925 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Life Map — Body</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400;1,600&family=Source+Sans+3:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg:        #f4f7f5;
+  --bg2:       #ffffff;
+  --bg3:       #edf2ef;
+  --bg4:       #e2ebe5;
+  --teal:      #2a7a72;
+  --teal2:     #3a9e94;
+  --teal3:     #d0ece9;
+  --blue:      #2c5f8a;
+  --blue2:     #4a87b8;
+  --blue3:     #d4e8f5;
+  --green:     #3a7a50;
+  --green2:    #5aaa74;
+  --green3:    #d4eedc;
+  --sage:      #6a9478;
+  --sage2:     #a8c8b4;
+  --sage3:     #e8f2ec;
+  --rust:      #8a4a30;
+  --rust2:     #c47a5a;
+  --rust3:     #f5e0d8;
+  --text:      #1a2a24;
+  --text2:     #3a5248;
+  --text3:     #6a8878;
+  --border:    rgba(42,122,114,0.18);
+  --border2:   rgba(42,122,114,0.10);
+  --shadow:    rgba(30,60,50,0.08);
+}
+
+* { margin:0; padding:0; box-sizing:border-box; }
+html { scroll-behavior:smooth; }
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Source Sans 3', sans-serif;
+  font-weight: 400;
+  min-height: 100vh;
+  overflow-x: hidden;
+  font-size: 17px;
+  line-height: 1.65;
+}
+
+#bg-canvas {
+  position:fixed; inset:0;
+  pointer-events:none; z-index:0; opacity:0.5;
+}
+
+.wrap {
+  position:relative; z-index:1;
+  max-width:980px; margin:0 auto;
+  padding:56px 32px 140px;
+}
+
+/* HEADER */
+.site-header {
+  text-align:center;
+  margin-bottom:56px;
+  padding-bottom:48px;
+  border-bottom: 1px solid var(--border);
+}
+
+.region-eyebrow {
+  font-family:'Source Sans 3', sans-serif;
+  font-size:12px; letter-spacing:0.35em;
+  text-transform:uppercase; color:var(--teal);
+  font-weight:600; margin-bottom:18px;
+}
+
+.site-title {
+  font-family:'Playfair Display', serif;
+  font-size:clamp(56px,10vw,100px);
+  font-weight:700; line-height:0.92;
+  color:var(--text);
+  letter-spacing:-0.02em;
+}
+
+.site-title-sub {
+  display:block;
+  font-family:'Playfair Display', serif;
+  font-size:clamp(24px,4.5vw,44px);
+  font-weight:400; font-style:italic;
+  color:var(--teal); margin-top:8px;
+  letter-spacing:0.02em;
+}
+
+.site-desc {
+  font-family:'Playfair Display', serif;
+  font-size:19px; color:var(--text2);
+  max-width:580px; margin:24px auto 0;
+  line-height:1.75; font-style:italic;
+}
+
+.ornament {
+  display:flex; align-items:center; gap:18px;
+  justify-content:center; margin:28px auto 0;
+  color:var(--sage); font-size:16px;
+}
+.ornament::before, .ornament::after {
+  content:''; height:1px; width:120px;
+}
+.ornament::before { background:linear-gradient(90deg,transparent,var(--sage2)); }
+.ornament::after  { background:linear-gradient(90deg,var(--sage2),transparent); }
+
+/* SELECTOR */
+.selector-block {
+  background:var(--bg2);
+  border:1px solid var(--border);
+  border-radius:12px;
+  padding:28px 32px;
+  margin-bottom:40px;
+  box-shadow:0 2px 16px var(--shadow);
+}
+
+.selector-title {
+  font-family:'Playfair Display', serif;
+  font-size:20px; color:var(--text);
+  margin-bottom:4px;
+}
+
+.selector-hint {
+  font-size:15px; color:var(--text3);
+  margin-bottom:18px; line-height:1.5;
+}
+
+.sel-row { display:flex; gap:10px; flex-wrap:wrap; margin-bottom:12px; }
+.sel-row:last-child { margin-bottom:0; }
+
+.sel-btn {
+  flex:1; min-width:110px;
+  padding:12px 16px; text-align:center;
+  background:var(--bg3);
+  border:1.5px solid transparent;
+  color:var(--text2);
+  font-family:'Source Sans 3', sans-serif;
+  font-size:15px; font-weight:400;
+  cursor:pointer; border-radius:8px;
+  transition:all 0.2s ease;
+}
+.sel-btn:hover {
+  background:var(--teal3);
+  color:var(--teal);
+  border-color:var(--teal2);
+}
+.sel-btn.active {
+  background:var(--teal);
+  border-color:var(--teal);
+  color:#ffffff;
+  font-weight:500;
+  box-shadow:0 2px 12px rgba(42,122,114,0.25);
+}
+
+/* SECTION HEADER */
+.sec-head { margin-bottom:20px; }
+.sec-head h2 {
+  font-family:'Playfair Display', serif;
+  font-size:26px; font-weight:600;
+  color:var(--text); margin-bottom:4px;
+}
+.sec-head p {
+  font-size:15px; color:var(--text3);
+  font-style:italic;
+}
+
+/* POSSIBLE */
+.possible-wrap { margin-bottom:52px; }
+
+.possible-grid { display:flex; flex-direction:column; gap:8px; }
+
+.possible-card {
+  display:flex; align-items:center; gap:16px;
+  padding:15px 20px;
+  background:var(--bg2);
+  border:1.5px solid var(--border2);
+  border-radius:10px; cursor:pointer;
+  transition:all 0.2s ease;
+  box-shadow:0 1px 6px var(--shadow);
+}
+.possible-card:hover {
+  border-color:var(--teal2);
+  transform:translateX(5px);
+  box-shadow:0 4px 20px rgba(42,122,114,0.12);
+  background:var(--bg2);
+}
+
+.poss-icon { font-size:28px; flex-shrink:0; }
+.poss-text { flex:1; }
+.poss-text strong {
+  display:block; font-size:16px;
+  font-weight:500; color:var(--text); margin-bottom:2px;
+}
+.poss-text span {
+  font-size:14px; color:var(--text3); font-style:italic;
+}
+
+.poss-badge {
+  font-size:11px; font-weight:600;
+  letter-spacing:0.08em; text-transform:uppercase;
+  padding:5px 14px; border-radius:20px; flex-shrink:0;
+}
+.b-quick { background:var(--green3); color:var(--green); }
+.b-step  { background:var(--teal3);  color:var(--teal);  }
+.b-door  { background:var(--blue3);  color:var(--blue);  }
+
+/* PATHS */
+.paths-section { margin-bottom:52px; }
+.paths-grid {
+  display:grid;
+  grid-template-columns:repeat(auto-fill,minmax(420px,1fr));
+  gap:18px;
+}
+
+.path-card {
+  background:var(--bg2);
+  border:1.5px solid var(--border2);
+  border-radius:12px; overflow:hidden;
+  cursor:pointer;
+  transition:all 0.25s ease;
+  box-shadow:0 2px 12px var(--shadow);
+}
+.path-card:hover {
+  transform:translateY(-3px);
+  box-shadow:0 8px 32px rgba(42,122,114,0.14);
+  border-color:var(--teal2);
+}
+.path-card.open {
+  box-shadow:0 12px 40px rgba(42,122,114,0.16);
+  border-color:var(--teal);
+}
+.path-card.dimmed { opacity:0.45; }
+
+.path-banner { height:5px; width:100%; }
+.path-card[data-path="adventure"] .path-banner { background:linear-gradient(90deg,var(--teal),var(--blue2)); }
+.path-card[data-path="honoring"]  .path-banner { background:linear-gradient(90deg,var(--green),var(--sage)); }
+.path-card[data-path="joy"]       .path-banner { background:linear-gradient(90deg,var(--blue),var(--teal2)); }
+.path-card[data-path="foundation"].path-banner { background:linear-gradient(90deg,var(--sage),var(--teal)); }
+
+.path-head {
+  padding:22px 24px 14px;
+  display:flex; align-items:flex-start; gap:16px;
+}
+
+.path-emblem {
+  width:54px; height:54px; border-radius:12px;
+  display:flex; align-items:center; justify-content:center;
+  font-size:26px; flex-shrink:0;
+}
+.path-card[data-path="adventure"] .path-emblem { background:var(--teal3); }
+.path-card[data-path="honoring"]  .path-emblem { background:var(--green3); }
+.path-card[data-path="joy"]       .path-emblem { background:var(--blue3); }
+.path-card[data-path="foundation"].path-emblem { background:var(--sage3); }
+
+.path-info { flex:1; }
+.path-name {
+  font-family:'Playfair Display', serif;
+  font-size:20px; font-weight:600;
+  color:var(--text); line-height:1.2; margin-bottom:4px;
+}
+.path-tagline {
+  font-size:14px; color:var(--text3);
+  font-style:italic; line-height:1.4;
+}
+
+.path-status-badge {
+  font-size:11px; font-weight:600;
+  letter-spacing:0.06em; text-transform:uppercase;
+  padding:5px 12px; border-radius:20px; flex-shrink:0;
+  background:var(--green3); color:var(--green);
+  margin-top:2px;
+}
+
+.path-progress { padding:0 24px 16px; }
+.prog-track {
+  height:6px; background:var(--bg3);
+  border-radius:3px; overflow:hidden; margin-bottom:7px;
+}
+.prog-fill {
+  height:100%; border-radius:3px;
+  transition:width 0.6s cubic-bezier(0.4,0,0.2,1);
+}
+.path-card[data-path="adventure"] .prog-fill { background:linear-gradient(90deg,var(--teal),var(--blue2)); }
+.path-card[data-path="honoring"]  .prog-fill { background:linear-gradient(90deg,var(--green),var(--sage)); }
+.path-card[data-path="joy"]       .prog-fill { background:linear-gradient(90deg,var(--blue),var(--teal2)); }
+.path-card[data-path="foundation"].prog-fill { background:linear-gradient(90deg,var(--sage),var(--teal)); }
+
+.prog-label {
+  display:flex; justify-content:space-between;
+  font-size:13px; color:var(--text3);
+}
+
+/* PATH BODY */
+.path-body {
+  display:none;
+  padding:4px 24px 24px;
+  border-top:1px solid var(--bg3);
+}
+.path-card.open .path-body { display:block; }
+
+.room-section-lbl {
+  font-size:11px; font-weight:600;
+  letter-spacing:0.2em; text-transform:uppercase;
+  color:var(--text3); margin:22px 0 10px;
+  display:flex; align-items:center; gap:10px;
+}
+.room-section-lbl::after {
+  content:''; flex:1; height:1px; background:var(--bg3);
+}
+
+.room-row {
+  display:flex; align-items:flex-start; gap:14px;
+  padding:11px 10px; border-radius:8px;
+  cursor:pointer; transition:all 0.15s ease;
+  margin-bottom:2px;
+}
+.room-row:hover { background:var(--bg3); }
+
+.room-check {
+  width:22px; height:22px; border-radius:50%;
+  border:2px solid var(--sage2); flex-shrink:0;
+  margin-top:1px; display:flex; align-items:center;
+  justify-content:center; transition:all 0.2s ease; font-size:12px;
+  background:var(--bg2);
+}
+.room-row.done .room-check {
+  background:var(--teal); border-color:var(--teal);
+  color:#fff; font-weight:700;
+}
+.room-row.rare .room-check { border-color:var(--green2); }
+.room-row.rare.done .room-check { background:var(--green); border-color:var(--green); color:#fff; }
+.room-row.trophy .room-check { border-color:var(--blue2); }
+.room-row.trophy.done .room-check { background:var(--blue); border-color:var(--blue); color:#fff; }
+
+.room-main {
+  font-size:16px; color:var(--text); line-height:1.5; transition:color 0.15s;
+}
+.room-row:hover .room-main { color:var(--teal); }
+.room-row.done .room-main {
+  color:var(--text3);
+  text-decoration:line-through;
+  text-decoration-color:var(--sage2);
+}
+.room-sub {
+  font-size:12px; color:var(--text3);
+  font-style:italic; margin-top:1px;
+}
+.room-row.rare  .room-sub { color:var(--green); }
+.room-row.trophy .room-sub { color:var(--blue); }
+
+.path-principle {
+  margin-top:20px; padding:16px 20px;
+  background:var(--teal3);
+  border-left:4px solid var(--teal);
+  border-radius:0 8px 8px 0;
+  font-family:'Playfair Display', serif;
+  font-style:italic; font-size:18px;
+  color:var(--teal); line-height:1.55;
+}
+
+/* EMERGENCY */
+.emergency-block {
+  margin-top:16px;
+  background:var(--rust3);
+  border:1.5px solid rgba(138,74,48,0.2);
+  border-radius:10px; overflow:hidden;
+}
+.emg-toggle {
+  display:flex; align-items:center; gap:10px;
+  padding:14px 18px; cursor:pointer; user-select:none;
+  font-size:13px; font-weight:600;
+  letter-spacing:0.06em; text-transform:uppercase;
+  color:var(--rust); transition:background 0.15s;
+}
+.emg-toggle:hover { background:rgba(138,74,48,0.06); }
+.emg-toggle::before { content:'⚠'; font-size:16px; }
+.emg-arrow { margin-left:auto; transition:transform 0.2s; font-size:14px; }
+.emergency-block.open .emg-arrow { transform:rotate(180deg); }
+.emg-body { display:none; padding:0 18px 18px; }
+.emergency-block.open .emg-body { display:block; }
+.emg-step {
+  margin-bottom:10px; padding:14px 16px;
+  background:rgba(255,255,255,0.6);
+  border-radius:8px;
+  border-left:3px solid var(--rust2);
+}
+.emg-step strong {
+  display:block; font-size:15px; font-weight:600;
+  color:var(--text); margin-bottom:4px;
+}
+.emg-step p { font-size:15px; color:var(--text2); line-height:1.65; }
+.emg-note {
+  margin-top:12px; padding:14px; border-radius:8px;
+  background:var(--green3); color:var(--green);
+  font-family:'Playfair Display', serif; font-style:italic;
+  font-size:17px; text-align:center;
+}
+
+/* DISCOVERY LOG */
+.disc-wrap { margin-top:16px; }
+.disc-form-card {
+  background:var(--bg2);
+  border:1.5px solid var(--border);
+  border-radius:12px; padding:28px 32px;
+  margin-bottom:28px;
+  box-shadow:0 2px 16px var(--shadow);
+}
+.disc-form-title {
+  font-family:'Playfair Display', serif;
+  font-size:22px; color:var(--text);
+  margin-bottom:16px;
+}
+.disc-ta {
+  width:100%; min-height:100px;
+  background:var(--bg3); border:1.5px solid var(--border2);
+  color:var(--text);
+  font-family:'Source Sans 3', sans-serif;
+  font-size:17px; line-height:1.65;
+  padding:14px 16px; border-radius:8px;
+  resize:vertical; outline:none;
+  transition:border-color 0.2s; margin-bottom:14px;
+}
+.disc-ta:focus { border-color:var(--teal); background:var(--bg2); }
+.disc-ta::placeholder { color:var(--text3); font-style:italic; }
+
+.disc-meta { display:flex; gap:10px; flex-wrap:wrap; margin-bottom:16px; }
+.disc-sel {
+  flex:1; min-width:140px;
+  background:var(--bg3); border:1.5px solid var(--border2);
+  color:var(--text2); font-family:'Source Sans 3', sans-serif;
+  font-size:15px; padding:10px 14px; border-radius:8px;
+  outline:none; cursor:pointer; transition:border-color 0.2s;
+}
+.disc-sel:focus { border-color:var(--teal); }
+
+.disc-btn {
+  display:inline-flex; align-items:center; gap:8px;
+  padding:13px 30px;
+  background:var(--teal);
+  border:none; color:#ffffff;
+  font-family:'Source Sans 3', sans-serif;
+  font-size:15px; font-weight:600;
+  letter-spacing:0.06em;
+  cursor:pointer; border-radius:8px;
+  transition:all 0.2s ease;
+}
+.disc-btn:hover {
+  background:var(--teal2);
+  box-shadow:0 4px 16px rgba(42,122,114,0.3);
+  transform:translateY(-1px);
+}
+
+.disc-entry {
+  padding:18px 0; border-bottom:1px solid var(--bg3);
+  animation:fadein 0.3s ease;
+}
+@keyframes fadein { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:none} }
+.disc-entry:last-child { border-bottom:none; }
+.disc-entry-text {
+  font-family:'Playfair Display', serif;
+  font-size:19px; color:var(--text);
+  line-height:1.55; margin-bottom:8px;
+}
+.disc-tags { display:flex; gap:8px; flex-wrap:wrap; align-items:center; }
+.dtag {
+  font-size:11px; font-weight:600;
+  letter-spacing:0.08em; text-transform:uppercase;
+  padding:4px 12px; border-radius:20px;
+}
+.dt-path { background:var(--teal3);  color:var(--teal); }
+.dt-type { background:var(--green3); color:var(--green); }
+.dt-date { color:var(--text3); font-size:12px; }
+
+.disc-empty {
+  text-align:center; padding:56px 20px;
+  font-family:'Playfair Display', serif;
+  font-size:21px; font-style:italic; color:var(--text3);
+}
+
+::-webkit-scrollbar { width:6px; }
+::-webkit-scrollbar-track { background:var(--bg); }
+::-webkit-scrollbar-thumb { background:var(--sage2); border-radius:3px; }
+
+@media(max-width:640px){
+  .paths-grid { grid-template-columns:1fr; }
+  .wrap { padding:32px 16px 100px; }
+  .site-title { font-size:52px; }
+  .selector-block,.disc-form-card { padding:20px; }
+}
+</style>
+</head>
+<body>
+<canvas id="bg-canvas"></canvas>
+<div class="wrap">
+
+  <header class="site-header">
+    <div class="region-eyebrow">Life Map · Body Region</div>
+    <h1 class="site-title">
+      Body
+      <span class="site-title-sub">the living map</span>
+    </h1>
+    <p class="site-desc">Feeling capable and well for the long term — for hiking, dancing, and aging well — while honoring the body you live in every day.</p>
+    <div class="ornament">✦</div>
+  </header>
+
+  <div class="selector-block">
+    <div class="selector-title">What do you bring today?</div>
+    <div class="selector-hint">Your energy and time shape which doors are open right now.</div>
+    <div class="sel-row" id="energy-row">
+      <button class="sel-btn" data-energy="low"    onclick="setEnergy('low')">🌧 Low energy</button>
+      <button class="sel-btn active" data-energy="medium" onclick="setEnergy('medium')">🌤 Medium energy</button>
+      <button class="sel-btn" data-energy="high"   onclick="setEnergy('high')">🔋 High energy</button>
+    </div>
+    <div class="sel-row" id="time-row">
+      <button class="sel-btn active" data-time="few"  onclick="setTime('few')">⏱ A few minutes</button>
+      <button class="sel-btn" data-time="hour" onclick="setTime('hour')">🕐 About an hour</button>
+      <button class="sel-btn" data-time="open" onclick="setTime('open')">🌿 Open-ended</button>
+    </div>
+  </div>
+
+  <div class="possible-wrap">
+    <div class="sec-head">
+      <h2>Open Doors</h2>
+      <p id="poss-sub">What's available to you right now</p>
+    </div>
+    <div class="possible-grid" id="poss-grid"></div>
+  </div>
+
+  <div class="paths-section">
+    <div class="sec-head">
+      <h2>The Four Paths</h2>
+      <p>Tap a path to explore its rooms, steps, and discoveries</p>
+    </div>
+    <div class="paths-grid" id="paths-grid"></div>
+  </div>
+
+  <div class="disc-wrap">
+    <div class="sec-head">
+      <h2>Discovery Log</h2>
+      <p>One sentence — what you learned, noticed, or understood today</p>
+    </div>
+    <div class="disc-form-card">
+      <div class="disc-form-title">Log a Discovery</div>
+      <textarea class="disc-ta" id="disc-text" placeholder="What moved today, even something small…"></textarea>
+      <div class="disc-meta">
+        <select class="disc-sel" id="disc-path">
+          <option value="">Which path?</option>
+          <option>Adventure & Capability</option>
+          <option>Honoring the Body</option>
+          <option>Joy & Expression</option>
+          <option>The Foundation</option>
+        </select>
+        <select class="disc-sel" id="disc-type">
+          <option value="">What kind?</option>
+          <option>🚪 Common Room</option>
+          <option>⭐ Rare Room</option>
+          <option>🔼 Checkpoint</option>
+          <option>🏆 Trophy</option>
+          <option>🔄 Doubling Back</option>
+          <option>🚗 Side Door</option>
+        </select>
+      </div>
+      <button class="disc-btn" onclick="logDiscovery()">✦ Log Discovery</button>
+    </div>
+    <div id="disc-list"></div>
+  </div>
+
+</div>
+<script>
+const PATHS=[
+  {id:'adventure',icon:'🥾',name:'Adventure & Capability',
+   tagline:'Boxing · Hiking · Building toward exciting goals',
+   principle:'Ignition first, consistency second. Missing a day is not a story about who you are.',
+   energyMin:'medium',timeMin:'hour',
+   commonRooms:[
+     {id:'a1',text:'Regular boxing attendance'},
+     {id:'a2',text:'Notice how your body feels after movement'},
+     {id:'a3',text:'Check in with your son about what\'s next'},
+     {id:'a4',text:'Conditioning work tied to what you want your body to do'},
+   ],
+   steps:[
+     {id:'a5',text:'First boxing class together'},
+     {id:'a6',text:'Find your rhythm and show up consistently'},
+     {id:'a7',text:'Build stamina and endurance'},
+     {id:'a8',text:'Establish a conditioning approach — strength, bone health'},
+     {id:'a9',text:'Take on something harder — sparring, a more demanding trail'},
+     {id:'a10',text:'Hit a fitness benchmark you couldn\'t before'},
+   ],
+   rareRooms:[
+     {id:'a11',text:'First class with your son'},
+     {id:'a12',text:'First hike completed together'},
+     {id:'a13',text:'Your son suggests the next adventure unprompted'},
+     {id:'a14',text:'A new activity unlocked by growing capability'},
+   ],
+   trophies:[
+     {id:'a15',text:'Booking the first hike — making it real'},
+     {id:'a16',text:'First hike completed'},
+     {id:'a17',text:'A tradition established with your son'},
+     {id:'a18',text:'A destination hike — somewhere that requires real preparation'},
+   ],
+   lowE:['Research a hiking trail nearby','Text your son about the boxing class','Watch a boxing technique video'],
+   quick:['10 minutes of conditioning','Map a local trail','Text your son about boxing'],
+   full:['Attend boxing class','Plan the first hike','Try a new conditioning exercise'],
+  },
+  {id:'honoring',icon:'🌿',name:'Honoring the Body',
+   tagline:'Morning stretch · Afternoon break · Evening release · Sleep',
+   principle:'Nurture it like something growing, not manage it like something broken.',
+   energyMin:'low',timeMin:'few',
+   commonRooms:[
+     {id:'h1',text:'Morning stretch — arriving in your body before the day begins'},
+     {id:'h2',text:'Afternoon movement break — interrupting the digital life'},
+     {id:'h3',text:'Evening release — unwinding the physical cost of the day'},
+     {id:'h4',text:'Notice how your body feels after different kinds of movement'},
+     {id:'h5',text:'Sleep as a practice, not just an outcome'},
+   ],
+   steps:[
+     {id:'h6',text:'Establish one of the three movement moments consistently'},
+     {id:'h7',text:'Add a second movement moment'},
+     {id:'h8',text:'Find a present-tense practice that feels native at this stage of life'},
+     {id:'h9',text:'Build a personal map of what works for your body now'},
+   ],
+   rareRooms:[
+     {id:'h10',text:'A moment of genuine physical surprise — your body delights you'},
+     {id:'h11',text:'Feeling grounded and present in a way someone else notices'},
+     {id:'h12',text:'Recognizing that animal ease — in a new form'},
+   ],
+   trophies:[
+     {id:'h13',text:'All three movement moments established as part of your day'},
+     {id:'h14',text:'A movement practice that feels genuinely yours at this stage of life'},
+     {id:'h15',text:'The moment you stop taking the way you move for granted again'},
+   ],
+   lowE:['Two minutes of gentle stretching','A body scan lying down','Notice how you\'re sitting right now'],
+   quick:['Morning stretch','Afternoon movement break','Neck and shoulder rolls'],
+   full:['Full morning yoga flow','Long intentional walk','Explore a new restorative practice'],
+  },
+  {id:'joy',icon:'💃',name:'Joy & Expression',
+   tagline:'African dance · Tango · Home practice · Moving with abandon',
+   principle:'Structure is what makes freedom possible. Know the form before you transcend it.',
+   energyMin:'medium',timeMin:'hour',
+   commonRooms:[
+     {id:'j1',text:'Attend class regularly — whatever style is current'},
+     {id:'j2',text:'Home practice — not performance, just moving in your own space'},
+     {id:'j3',text:'Listen to music with intention — feeding the body\'s memory of movement'},
+     {id:'j4',text:'Notice what styles make you want to move'},
+   ],
+   steps:[
+     {id:'j5',text:'Attend the first African dance class'},
+     {id:'j6',text:'Find what resonates — styles, teachers, communities'},
+     {id:'j7',text:'Begin a partner dance — tango or something that surprises you'},
+     {id:'j8',text:'Develop a home practice that feels sustainable'},
+     {id:'j9',text:'Build enough vocabulary in a style to feel fluent'},
+     {id:'j10',text:'Dance with someone who matches your energy and commitment'},
+   ],
+   rareRooms:[
+     {id:'j11',text:'The first African dance class — whatever it tells you'},
+     {id:'j12',text:'The moment a style feels native rather than learned'},
+     {id:'j13',text:'Dancing with a partner where it clicks — that tango quality'},
+     {id:'j14',text:'Someone notices the way you move — grounded, present, alive'},
+     {id:'j15',text:'Dancing with abandon — when it finally arrives, you\'ll know'},
+   ],
+   trophies:[
+     {id:'j16',text:'First class attended'},
+     {id:'j17',text:'A regular class that feels like yours'},
+     {id:'j18',text:'A home practice established'},
+     {id:'j19',text:'Tango — returning to it'},
+     {id:'j20',text:'The moment of abandon — named and claimed when it happens'},
+   ],
+   lowE:['Put on music you love and just listen','Watch a dance performance online','Gentle movement in your living room'],
+   quick:['10 minutes of free movement','Look up African dance classes','Find a tango playlist'],
+   full:['Attend African dance class','Work on home practice','Research tango communities'],
+  },
+  {id:'foundation',icon:'🌱',name:'The Foundation',
+   tagline:'Strength · Bone health · Heart health · Longevity',
+   principle:'The unglamorous path. You won\'t feel it working until suddenly everything else gets easier.',
+   energyMin:'high',timeMin:'hour',
+   hasEmergency:true,
+   commonRooms:[
+     {id:'f1',text:'Regular gym sessions — lifting, resistance work'},
+     {id:'f2',text:'Track how your body responds — energy, sleep, recovery, mood'},
+     {id:'f3',text:'Eat in a way that supports the work — protein, bone health'},
+     {id:'f4',text:'Rest as part of the practice, not a break from it'},
+   ],
+   steps:[
+     {id:'f5',text:'Research what your body needs — bone density, menopause, heart health'},
+     {id:'f6',text:'Establish a baseline — where are you starting from'},
+     {id:'f7',text:'Find a sustainable structure — frequency, format, duration'},
+     {id:'f8',text:'Build a lifting practice that feels like yours'},
+     {id:'f9',text:'Connect conditioning to other paths — boxing, hiking, dance'},
+   ],
+   rareRooms:[
+     {id:'f10',text:'The moment you lift something and surprise yourself'},
+     {id:'f11',text:'A health result that makes the invisible work visible'},
+     {id:'f12',text:'The Foundation quietly unlocking something in another path'},
+   ],
+   trophies:[
+     {id:'f13',text:'A protocol established and understood — knowing what your body needs and why'},
+     {id:'f14',text:'A consistent gym practice that holds across seasons'},
+     {id:'f15',text:'A measurable health marker that reflects the work'},
+   ],
+   lowE:['Read about bone density and menopause','Plan your next gym session','A gentle walk'],
+   quick:['10 minutes of bodyweight exercises','Research a bone health protocol','A walk around the block'],
+   full:['Full gym session','Review and adjust your protocol','Try a new lifting exercise'],
+  }
+];
+
+let S={energy:'medium',time:'few',rooms:{},discoveries:[]};
+const EV={low:0,medium:1,high:2}, TV={few:0,hour:1,open:2};
+
+function load(){try{const d=localStorage.getItem('lm-body-v4');if(d)S={...S,...JSON.parse(d)};}catch(e){}}
+function save(){try{localStorage.setItem('lm-body-v4',JSON.stringify(S));}catch(e){}}
+function avail(p){return EV[S.energy]>=EV[p.energyMin]&&TV[S.time]>=TV[p.timeMin];}
+
+function setEnergy(v){
+  S.energy=v;
+  document.querySelectorAll('[data-energy]').forEach(b=>b.classList.toggle('active',b.dataset.energy===v));
+  save();renderPossible();renderPaths();
+}
+function setTime(v){
+  S.time=v;
+  document.querySelectorAll('[data-time]').forEach(b=>b.classList.toggle('active',b.dataset.time===v));
+  save();renderPossible();renderPaths();
+}
+
+function renderPossible(){
+  const grid=document.getElementById('poss-grid');
+  const sub=document.getElementById('poss-sub');
+  const items=[];
+  PATHS.forEach(p=>{
+    let opts,badge,cls;
+    if(S.energy==='low'){opts=p.lowE;badge='Side Door';cls='b-door';}
+    else if(S.time==='few'){opts=p.quick;badge='Quick Win';cls='b-quick';}
+    else{opts=p.full;badge='Next Step';cls='b-step';}
+    opts.slice(0,2).forEach(o=>items.push({icon:p.icon,text:o,path:p.name,badge,cls,id:p.id}));
+  });
+  const el={low:'low energy',medium:'medium energy',high:'high energy'}[S.energy];
+  const tl={few:'a few minutes',hour:'about an hour',open:'open-ended time'}[S.time];
+  sub.textContent=`With ${el} and ${tl}`;
+  grid.innerHTML=items.slice(0,6).map(it=>`
+    <div class="possible-card" onclick="openPath('${it.id}')">
+      <span class="poss-icon">${it.icon}</span>
+      <div class="poss-text">
+        <strong>${it.text}</strong>
+        <span>${it.path}</span>
+      </div>
+      <span class="poss-badge ${it.cls}">${it.badge}</span>
+    </div>
+  `).join('');
+}
+
+function getProgress(p){
+  const rs=S.rooms[p.id]||{};
+  const all=[...p.commonRooms,...p.steps,...p.rareRooms,...p.trophies];
+  const done=all.filter(r=>rs[r.id]).length;
+  return{done,total:all.length,pct:all.length?Math.round(done/all.length*100):0};
+}
+
+function roomSection(p,rooms,lbl,cls){
+  if(!rooms.length)return'';
+  const rs=S.rooms[p.id]||{};
+  return`<div class="room-section-lbl">${lbl}</div>`+rooms.map(r=>`
+    <div class="room-row ${cls} ${rs[r.id]?'done':''}" onclick="toggleRoom(event,'${p.id}','${r.id}')">
+      <div class="room-check">${rs[r.id]?'✓':''}</div>
+      <div>
+        <div class="room-main">${r.text}</div>
+        <div class="room-sub">${lbl.replace(/[🚪→⭐🏆]/g,'').trim()}</div>
+      </div>
+    </div>
+  `).join('');
+}
+
+function renderPaths(){
+  const grid=document.getElementById('paths-grid');
+  const openIds=new Set([...grid.querySelectorAll('.path-card.open')].map(c=>c.dataset.path));
+  grid.innerHTML=PATHS.map(p=>{
+    const prog=getProgress(p);
+    const isOpen=openIds.has(p.id);
+    const dim=!avail(p)&&S.energy!=='high';
+    return`
+      <div class="path-card ${dim?'dimmed':''} ${isOpen?'open':''}" data-path="${p.id}" onclick="handleCard(event,'${p.id}')">
+        <div class="path-banner"></div>
+        <div class="path-head">
+          <div class="path-emblem">${p.icon}</div>
+          <div class="path-info">
+            <div class="path-name">${p.name}</div>
+            <div class="path-tagline">${p.tagline}</div>
+          </div>
+          <span class="path-status-badge">Threshold</span>
+        </div>
+        <div class="path-progress">
+          <div class="prog-track"><div class="prog-fill" style="width:${prog.pct}%"></div></div>
+          <div class="prog-label"><span>${prog.done} of ${prog.total} discovered</span><span>${prog.pct}%</span></div>
+        </div>
+        <div class="path-body">
+          ${roomSection(p,p.commonRooms,'🚪 Common Rooms','common')}
+          ${roomSection(p,p.steps,'→ Steps','step')}
+          ${roomSection(p,p.rareRooms,'⭐ Rare Rooms','rare')}
+          ${roomSection(p,p.trophies,'🏆 Trophies','trophy')}
+          <div class="path-principle">${p.principle}</div>
+          ${p.hasEmergency?`
+            <div class="emergency-block" onclick="event.stopPropagation();this.classList.toggle('open')">
+              <div class="emg-toggle">When it falls apart — Emergency Architecture<span class="emg-arrow">▾</span></div>
+              <div class="emg-body">
+                <div class="emg-step"><strong>Notice the story first.</strong><p>"This always happens, I always do this, the whole thing is broken." That story is not information. It's a symptom of interrupted excitement.</p></div>
+                <div class="emg-step"><strong>Find the smallest open door.</strong><p>A modified version? Swap to Honoring the Body? Stay connected without aggravating what's wrong? Use the time to learn instead?</p></div>
+                <div class="emg-step"><strong>Name it as a detour, not an ending.</strong><p>You are not scrapping the path. You are taking a side road that rejoins the main route further along.</p></div>
+                <div class="emg-step"><strong>Give yourself a concrete return trigger.</strong><p>Not "when I feel ready." Something specific: "when I can walk without pain" or "next Monday I try ten minutes."</p></div>
+                <div class="emg-note">Any path, any day, any amount. The map doesn't expire.</div>
+              </div>
+            </div>
+          `:''}
+        </div>
+      </div>
+    `;
+  }).join('');
+}
+
+function handleCard(e,id){
+  if(e.target.closest('.room-row')||e.target.closest('.emergency-block'))return;
+  const card=e.currentTarget;
+  const wasOpen=card.classList.contains('open');
+  document.querySelectorAll('.path-card').forEach(c=>c.classList.remove('open'));
+  if(!wasOpen){card.classList.add('open');setTimeout(()=>card.scrollIntoView({behavior:'smooth',block:'nearest'}),50);}
+}
+function openPath(id){
+  const card=document.querySelector(`[data-path="${id}"]`);
+  if(!card)return;
+  document.querySelectorAll('.path-card').forEach(c=>c.classList.remove('open'));
+  card.classList.add('open');
+  setTimeout(()=>card.scrollIntoView({behavior:'smooth',block:'start'}),50);
+}
+function toggleRoom(e,pid,rid){
+  e.stopPropagation();
+  if(!S.rooms[pid])S.rooms[pid]={};
+  S.rooms[pid][rid]=!S.rooms[pid][rid];
+  save();renderPaths();
+}
+
+function logDiscovery(){
+  const text=document.getElementById('disc-text').value.trim();
+  if(!text)return;
+  S.discoveries.unshift({
+    id:Date.now(),text,
+    path:document.getElementById('disc-path').value,
+    type:document.getElementById('disc-type').value,
+    date:new Date().toLocaleDateString('en-US',{month:'short',day:'numeric'})
+  });
+  document.getElementById('disc-text').value='';
+  document.getElementById('disc-path').value='';
+  document.getElementById('disc-type').value='';
+  save();renderDiscoveries();
+}
+function renderDiscoveries(){
+  const el=document.getElementById('disc-list');
+  if(!S.discoveries.length){el.innerHTML='<div class="disc-empty">No discoveries yet. The map is waiting to be explored.</div>';return;}
+  el.innerHTML=S.discoveries.map(d=>`
+    <div class="disc-entry">
+      <div class="disc-entry-text">${d.text}</div>
+      <div class="disc-tags">
+        ${d.path?`<span class="dtag dt-path">${d.path}</span>`:''}
+        ${d.type?`<span class="dtag dt-type">${d.type}</span>`:''}
+        <span class="dtag dt-date">${d.date}</span>
+      </div>
+    </div>
+  `).join('');
+}
+
+// Canvas — soft botanical watercolor washes
+function drawCanvas(){
+  const c=document.getElementById('bg-canvas');
+  const ctx=c.getContext('2d');
+  c.width=window.innerWidth; c.height=window.innerHeight;
+
+  // Soft washes
+  [[c.width*0.05,c.height*0.05,c.width*0.5,'rgba(42,122,114,0.06)'],
+   [c.width*0.9,c.height*0.15,c.width*0.4,'rgba(44,95,138,0.05)'],
+   [c.width*0.15,c.height*0.85,c.width*0.45,'rgba(58,122,80,0.06)'],
+   [c.width*0.85,c.height*0.75,c.width*0.35,'rgba(42,122,114,0.04)'],
+  ].forEach(([x,y,r,col])=>{
+    const g=ctx.createRadialGradient(x,y,0,x,y,r);
+    g.addColorStop(0,col);g.addColorStop(1,'transparent');
+    ctx.fillStyle=g;ctx.fillRect(0,0,c.width,c.height);
+  });
+
+  // Botanical fronds — light sage
+  function fern(sx,sy,len,ang,dep){
+    if(dep<=0||len<12)return;
+    const ex=sx+Math.cos(ang)*len,ey=sy+Math.sin(ang)*len;
+    ctx.beginPath();ctx.moveTo(sx,sy);ctx.lineTo(ex,ey);ctx.stroke();
+    fern(ex,ey,len*0.67,ang-0.42,dep-1);
+    fern(ex,ey,len*0.67,ang+0.42,dep-1);
+    fern(sx+(ex-sx)*0.5,sy+(ey-sy)*0.5,len*0.38,ang-0.5,dep-2);
+    fern(sx+(ex-sx)*0.5,sy+(ey-sy)*0.5,len*0.38,ang+0.5,dep-2);
+  }
+
+  ctx.strokeStyle='rgba(106,148,120,0.2)';ctx.lineWidth=0.8;ctx.lineCap='round';
+  ctx.globalAlpha=0.7;fern(c.width-30,0,150,Math.PI*0.73,5);
+  ctx.globalAlpha=0.4;fern(c.width-130,0,90,Math.PI*0.67,4);
+  ctx.strokeStyle='rgba(44,95,138,0.15)';
+  ctx.globalAlpha=0.5;fern(0,c.height+10,120,-Math.PI*0.28,4);
+  ctx.globalAlpha=1;
+
+  // Soft leaf shapes
+  ctx.fillStyle='rgba(106,148,120,0.07)';
+  [[240,170,24,10,-35],[860,350,20,8,50],[540,80,22,9,65],[400,720,28,11,-20]].forEach(([x,y,rx,ry,rot])=>{
+    ctx.save();ctx.translate(x,y);ctx.rotate(rot*Math.PI/180);
+    ctx.beginPath();ctx.ellipse(0,0,rx,ry,0,0,Math.PI*2);ctx.fill();ctx.restore();
+  });
+}
+window.addEventListener('resize',drawCanvas);
+
+load();
+drawCanvas();
+renderPossible();
+renderPaths();
+renderDiscoveries();
+document.querySelectorAll('[data-energy]').forEach(b=>b.classList.toggle('active',b.dataset.energy===S.energy));
+document.querySelectorAll('[data-time]').forEach(b=>b.classList.toggle('active',b.dataset.time===S.time));
+</script>
+</body>
+</html>
