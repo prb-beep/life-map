@@ -1,0 +1,1407 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Life Map</title>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;1,9..144,300;1,9..144,400&family=Nunito:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+html,body{height:100%;overflow:hidden;background:#1a2e1a;display:flex;align-items:center;justify-content:center;font-family:'Nunito',sans-serif;}
+.phone{width:min(390px,100vw);height:min(844px,100vh);background:#f7f3ee;border-radius:min(44px,0px);overflow:hidden;position:relative;box-shadow:0 40px 120px rgba(0,0,0,0.6);}
+@media(max-width:390px){.phone{border-radius:0;width:100vw;height:100vh;}}
+.screen{position:absolute;inset:0;overflow-y:auto;overflow-x:hidden;transition:transform 0.4s cubic-bezier(0.4,0,0.2,1),opacity 0.4s ease;-webkit-overflow-scrolling:touch;scrollbar-width:none;padding-bottom:80px;}
+.screen::-webkit-scrollbar{display:none;}
+.screen.off-left{transform:translateX(-100%);opacity:0;pointer-events:none;}
+.screen.off-right{transform:translateX(100%);opacity:0;pointer-events:none;}
+.bnav{position:absolute;bottom:0;left:0;right:0;background:rgba(247,243,238,0.97);backdrop-filter:blur(12px);border-top:1px solid rgba(0,0,0,0.07);padding:10px 0 max(24px,env(safe-area-inset-bottom));display:flex;justify-content:space-around;z-index:50;}
+.nb{display:flex;flex-direction:column;align-items:center;gap:3px;cursor:pointer;padding:5px 16px;border-radius:13px;transition:all 0.15s;border:none;background:none;}
+.nb.on{background:rgba(58,122,58,0.12);}
+.ni{font-size:21px;line-height:1;}
+.nl{font-size:10px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:#7a9a7a;}
+.nb.on .nl{color:#3a7a3a;}
+.section-lbl{font-size:11px;font-weight:700;letter-spacing:0.22em;text-transform:uppercase;color:#7a9a7a;padding:18px 24px 8px;}
+.overlay{position:absolute;inset:0;z-index:80;background:rgba(20,40,20,0.72);backdrop-filter:blur(6px);display:flex;align-items:flex-end;opacity:0;pointer-events:none;transition:opacity 0.3s;}
+.overlay.show{opacity:1;pointer-events:all;}
+.sheet{background:#f7f3ee;border-radius:28px 28px 0 0;padding:26px 24px max(48px,env(safe-area-inset-bottom));width:100%;transform:translateY(100%);transition:transform 0.42s cubic-bezier(0.34,1.15,0.64,1);position:relative;overflow:hidden;}
+.overlay.show .sheet{transform:translateY(0);}
+.sheet-handle{width:40px;height:4px;background:#d8d0c8;border-radius:2px;margin:0 auto 20px;}
+.sheet-btn{display:block;width:100%;padding:15px;border:none;border-radius:13px;color:#fff;font-family:'Nunito',sans-serif;font-size:15px;font-weight:700;cursor:pointer;letter-spacing:0.04em;margin-top:20px;}
+.confetti-wrap{position:absolute;inset:0;pointer-events:none;overflow:hidden;z-index:0;}
+.cp{position:absolute;animation:cfall linear forwards;}
+@keyframes cfall{0%{opacity:1;transform:translateY(-20px) rotate(0)}100%{opacity:0;transform:translateY(800px) rotate(540deg)}}
+.float-xp{position:absolute;background:#2a5a2a;color:#fff;font-size:13px;font-weight:700;padding:6px 13px;border-radius:20px;box-shadow:0 4px 14px rgba(0,0,0,0.18);pointer-events:none;z-index:60;animation:floatup 2s ease forwards;white-space:nowrap;}
+@keyframes floatup{0%{opacity:0;transform:translateY(0) scale(0.8)}12%{opacity:1;transform:translateY(-10px) scale(1)}80%{opacity:1;transform:translateY(-42px)}100%{opacity:0;transform:translateY(-58px) scale(0.95)}}
+
+/* HOME */
+#home{background:#f7f3ee;}
+.sky{height:260px;position:relative;overflow:hidden;background:linear-gradient(180deg,#b4d4bc 0%,#d4e8d8 55%,#f7f3ee 100%);}
+.sun{position:absolute;top:36px;right:52px;width:56px;height:56px;border-radius:50%;background:radial-gradient(circle,#f5e098,#e8be58);box-shadow:0 0 48px rgba(232,190,88,0.45),0 0 90px rgba(232,190,88,0.18);animation:sp 4s ease-in-out infinite;}
+@keyframes sp{0%,100%{box-shadow:0 0 48px rgba(232,190,88,0.45),0 0 90px rgba(232,190,88,0.18)}50%{box-shadow:0 0 64px rgba(232,190,88,0.62),0 0 120px rgba(232,190,88,0.26)}}
+.cloud{position:absolute;background:rgba(255,255,255,0.62);border-radius:40px;animation:drift linear infinite;}
+@keyframes drift{from{transform:translateX(0)}to{transform:translateX(-460px)}}
+.ground{position:absolute;bottom:0;left:0;right:0;height:24px;background:linear-gradient(180deg,#bcd8b4,#aac8a4);}
+.garden-row{position:absolute;bottom:0;left:0;right:0;height:80px;display:flex;align-items:flex-end;justify-content:space-around;padding:0 8px;}
+.plant-btn{display:flex;flex-direction:column;align-items:center;cursor:pointer;transition:transform 0.15s;border:none;background:none;padding:0 2px;}
+.plant-btn:active{transform:scale(0.93);}
+.plant-lbl{font-family:'Fraunces',serif;font-size:9px;color:#2a5a2a;margin-top:1px;line-height:1;text-align:center;}
+.home-meta{padding:12px 24px 0;}
+.home-date{font-size:11px;font-weight:700;letter-spacing:0.24em;text-transform:uppercase;color:#6a9a6a;margin-bottom:2px;}
+.home-title{font-family:'Fraunces',serif;font-size:30px;font-weight:300;color:#1a3020;line-height:1;}
+.home-title em{font-style:italic;color:#3a7a3a;}
+.quest-strip{margin:10px 16px 0;background:linear-gradient(135deg,#2a5a2a,#3a7a3a);border-radius:18px;padding:15px 17px;cursor:pointer;position:relative;overflow:hidden;}
+.quest-strip::after{content:'';position:absolute;top:-36px;right:-36px;width:110px;height:110px;border-radius:50%;background:rgba(255,255,255,0.05);}
+.qs-lbl{font-size:10px;font-weight:700;letter-spacing:0.26em;text-transform:uppercase;color:rgba(255,255,255,0.52);margin-bottom:5px;}
+.qs-txt{font-family:'Fraunces',serif;font-size:15px;color:#fff;line-height:1.35;margin-bottom:8px;}
+.qs-tag{display:inline-flex;align-items:center;gap:6px;background:rgba(255,255,255,0.14);border-radius:20px;padding:4px 12px;font-size:12px;color:rgba(255,255,255,0.88);font-weight:500;}
+.r-chips{display:flex;gap:10px;padding:0 16px 4px;overflow-x:auto;scrollbar-width:none;}
+.r-chips::-webkit-scrollbar{display:none;}
+.r-chip{flex-shrink:0;width:122px;background:#fff;border-radius:16px;padding:13px;cursor:pointer;box-shadow:0 2px 10px rgba(0,0,0,0.07);border:1.5px solid rgba(0,0,0,0.05);transition:all 0.18s;position:relative;overflow:hidden;}
+.r-chip:active{transform:scale(0.96);}
+.r-chip.lit{border-color:#3a7a3a;box-shadow:0 4px 16px rgba(58,122,58,0.18);}
+.chip-glow{position:absolute;top:-14px;right:-14px;width:52px;height:52px;border-radius:50%;opacity:0.13;}
+.chip-ico{font-size:24px;margin-bottom:5px;display:block;}
+.chip-name{font-family:'Fraunces',serif;font-size:13px;color:#1a3020;margin-bottom:2px;line-height:1.2;}
+.chip-lvl{font-size:10px;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;margin-bottom:5px;}
+.chip-bar{height:3px;background:#f0ede8;border-radius:2px;overflow:hidden;}
+.chip-bar-fill{height:100%;border-radius:2px;transition:width 0.6s ease;}
+
+/* REGION */
+.region-hero{height:200px;position:relative;overflow:hidden;}
+.hero-deco{position:absolute;right:0;bottom:0;opacity:0.35;pointer-events:none;}
+.back-btn{position:absolute;top:50px;left:18px;width:36px;height:36px;border-radius:50%;background:rgba(255,255,255,0.16);border:none;color:#fff;font-size:17px;cursor:pointer;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(4px);}
+.hero-content{position:absolute;bottom:0;left:0;right:0;padding:0 22px 16px;}
+.hero-eye{font-size:10px;font-weight:700;letter-spacing:0.3em;text-transform:uppercase;color:rgba(255,255,255,0.52);margin-bottom:4px;}
+.hero-title{font-family:'Fraunces',serif;font-size:34px;font-weight:300;font-style:italic;color:#fff;line-height:0.95;margin-bottom:7px;}
+.hero-principle{font-family:'Fraunces',serif;font-size:13px;font-style:italic;color:rgba(255,255,255,0.72);line-height:1.5;}
+.path-card{margin:10px 16px 0;background:#fff;border-radius:18px;overflow:hidden;box-shadow:0 2px 12px rgba(0,0,0,0.06);cursor:pointer;border:1.5px solid rgba(0,0,0,0.04);transition:box-shadow 0.2s;}
+.path-card.open{box-shadow:0 8px 28px rgba(0,0,0,0.12);}
+.path-top{height:4px;}
+.path-head{padding:13px 15px;display:flex;align-items:center;gap:11px;}
+.path-ico{width:44px;height:44px;border-radius:11px;display:flex;align-items:center;justify-content:center;font-size:21px;flex-shrink:0;}
+.path-info{flex:1;}
+.path-name{font-family:'Fraunces',serif;font-size:16px;color:#1a3020;margin-bottom:1px;line-height:1.2;}
+.path-tagline{font-size:12px;color:#7a9a7a;font-style:italic;}
+.path-pill{font-size:10px;font-weight:700;letter-spacing:0.07em;text-transform:uppercase;padding:5px 10px;border-radius:20px;flex-shrink:0;}
+.path-xp-row{padding:0 15px 3px;display:flex;align-items:center;gap:9px;}
+.path-xp-track{flex:1;height:5px;background:#f0ede8;border-radius:3px;overflow:hidden;}
+.path-xp-fill{height:100%;border-radius:3px;transition:width 0.6s ease;}
+.path-xp-meta{display:flex;justify-content:space-between;padding:0 15px 11px;}
+.path-xp-disc{font-size:11px;color:#9aaa9a;}
+.path-xp-next{font-size:11px;font-weight:700;}
+.path-rooms{display:none;border-top:1px solid #f5f2ef;padding:11px 15px 15px;}
+.path-card.open .path-rooms{display:block;}
+.room-sec{font-size:10px;font-weight:700;letter-spacing:0.2em;text-transform:uppercase;color:#a8b8a8;margin:13px 0 5px;display:flex;align-items:center;gap:8px;}
+.room-sec:first-child{margin-top:0;}
+.room-sec::after{content:'';flex:1;height:1px;background:#f0ede8;}
+.room-row{display:flex;align-items:flex-start;gap:11px;padding:8px 5px;border-radius:8px;cursor:pointer;transition:background 0.12s;}
+.room-row:hover{background:#f8f5f2;}
+.room-row.locked{opacity:0.4;cursor:default;}
+.room-row.locked:hover{background:transparent;}
+/* trophies never get strikethrough */
+.room-row.done:not(.trophy-row) .r-text{color:#9aaa9a;text-decoration:line-through;text-decoration-color:#c8d8c4;}
+.room-row.done:not(.trophy-row) .r-dot{background:#3a7a3a;border-color:#3a7a3a;color:#fff;}
+/* non-trophy done dot */
+.room-row.done .r-dot{background:#3a7a3a;border-color:#3a7a3a;color:#fff;}
+/* trophy row overrides */
+.room-row.trophy-row.done .r-text{color:#2a4a2a;text-decoration:none;}
+.room-row.trophy-row.done .r-dot{background:#c4a040;border-color:#c4a040;color:#fff;font-size:12px;}
+.r-dot{width:20px;height:20px;border-radius:50%;border:2px solid #c8d8c4;flex-shrink:0;margin-top:1px;display:flex;align-items:center;justify-content:center;font-size:10px;background:#fff;transition:all 0.18s;}
+.room-row.locked .r-dot{background:#f5f2ef;border-color:#e0dbd4;font-size:9px;}
+.r-body{flex:1;}
+.r-text{font-size:14px;color:#2a4a2a;line-height:1.45;}
+.room-row.locked .r-text{color:#b8c8b4;}
+.r-sub{font-size:11px;color:#a8b8a4;font-style:italic;margin-top:1px;}
+.r-sub.rare{color:#5a9a6a;}
+.r-sub.trophy-lnk{color:#c4a040;cursor:pointer;font-weight:600;}
+.lv-banner{margin:12px 0 0;padding:13px;background:linear-gradient(135deg,#eaf4ec,#d8eed8);border-radius:12px;border:1.5px solid rgba(58,122,58,0.2);display:flex;align-items:center;gap:11px;cursor:pointer;transition:all 0.18s;}
+.lv-banner:hover{box-shadow:0 4px 16px rgba(58,122,58,0.15);}
+.lv-banner-ico{font-size:26px;flex-shrink:0;}
+.lv-banner-text{flex:1;}
+.lv-banner-eye{font-size:10px;font-weight:700;letter-spacing:0.2em;text-transform:uppercase;color:#5a9a6a;margin-bottom:1px;}
+.lv-banner-title{font-family:'Fraunces',serif;font-size:16px;color:#1a3020;}
+.lv-banner-sub{font-size:12px;color:#5a8a5a;font-style:italic;}
+
+/* Emergency Architecture */
+.emergency-box{margin:14px 0 0;background:#fffbf0;border:1.5px solid #e8c870;border-radius:14px;padding:16px;}
+.em-header{display:flex;align-items:center;gap:8px;margin-bottom:10px;}
+.em-icon{font-size:20px;}
+.em-title{font-size:11px;font-weight:700;letter-spacing:0.18em;text-transform:uppercase;color:#a07020;}
+.em-principle{font-family:'Fraunces',serif;font-style:italic;font-size:14px;color:#6a4a10;line-height:1.6;margin-bottom:14px;padding-bottom:12px;border-bottom:1px solid #f0dfa0;}
+.em-context{font-size:13px;color:#5a4010;line-height:1.6;margin-bottom:14px;}
+.em-phase{margin-bottom:12px;}
+.em-phase-title{font-size:11px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:#a07020;margin-bottom:6px;}
+.em-step{font-size:13px;color:#5a4010;padding:5px 0;display:flex;align-items:flex-start;gap:8px;line-height:1.45;}
+.em-step-num{background:#e8c870;color:#6a4a10;width:18px;height:18px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;flex-shrink:0;margin-top:1px;}
+.em-note{font-family:'Fraunces',serif;font-style:italic;font-size:13px;color:#7a5a20;background:#fff8e0;border-radius:8px;padding:10px 12px;margin-top:10px;line-height:1.55;}
+
+/* MAP */
+#map-screen{background:#f7f3ee;}
+.map-hero{padding:52px 22px 16px;background:linear-gradient(150deg,#1a3a28,#2d5a3a);}
+.map-hero-title{font-family:'Fraunces',serif;font-size:30px;font-weight:300;font-style:italic;color:#fff;margin-bottom:3px;}
+.map-hero-sub{font-size:13px;color:rgba(255,255,255,0.6);}
+.map-body{padding:14px;}
+.legend-row{display:flex;align-items:center;gap:12px;margin-bottom:8px;cursor:pointer;padding:10px 12px;border-radius:12px;background:#fff;box-shadow:0 2px 8px rgba(0,0,0,0.05);transition:all 0.15s;}
+.legend-row:hover{box-shadow:0 4px 14px rgba(0,0,0,0.1);}
+.legend-ico{width:36px;height:36px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:19px;flex-shrink:0;}
+.legend-info{flex:1;}
+.legend-name{font-family:'Fraunces',serif;font-size:15px;color:#1a3020;margin-bottom:1px;}
+.legend-status{font-size:11px;color:#7a9a7a;font-style:italic;}
+.legend-bw{width:50px;}
+.legend-bar{height:4px;background:#f0ede8;border-radius:2px;overflow:hidden;margin-bottom:2px;}
+.legend-bar-fill{height:100%;border-radius:2px;}
+.legend-pct{font-size:10px;color:#9aaa9a;text-align:right;}
+.trophy-shelf{background:#fff;border-radius:16px;padding:15px;box-shadow:0 2px 10px rgba(0,0,0,0.06);}
+.shelf-grid{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px;}
+.trophy-slot{width:62px;text-align:center;cursor:pointer;}
+.t-ico{width:50px;height:50px;border-radius:13px;display:flex;align-items:center;justify-content:center;font-size:25px;margin:0 auto 4px;transition:transform 0.18s;}
+.trophy-slot:active .t-ico{transform:scale(0.9);}
+.trophy-slot.earned .t-ico{background:#fffae6;box-shadow:0 2px 10px rgba(196,160,48,0.22);}
+.trophy-slot.locked .t-ico{background:#f5f2ef;}
+.trophy-slot.locked .t-ico span{filter:grayscale(1);opacity:0.28;}
+.t-lbl{font-size:10px;color:#6a8a6a;line-height:1.25;}
+.trophy-slot.locked .t-lbl{color:#b8c8b4;}
+.ref-section{background:#fff;border-radius:14px;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,0.05);margin-bottom:8px;}
+.ref-toggle{display:flex;align-items:center;justify-content:space-between;padding:14px;cursor:pointer;}
+.ref-toggle:hover{background:#faf8f5;}
+.ref-tl{display:flex;align-items:center;gap:9px;}
+.ref-ti{font-size:18px;}
+.ref-tt{font-family:'Fraunces',serif;font-size:16px;color:#1a3020;}
+.ref-ts{font-size:11px;color:#7a9a7a;font-style:italic;}
+.ref-arrow{font-size:13px;color:#a8b8a8;transition:transform 0.2s;}
+.ref-section.open .ref-arrow{transform:rotate(180deg);}
+.ref-body{display:none;padding:0 14px 14px;border-top:1px solid #f5f2ef;}
+.ref-section.open .ref-body{display:block;}
+.ref-principle{background:linear-gradient(135deg,#eaf4ec,#f0f8f0);border-left:3px solid #3a7a3a;border-radius:0 8px 8px 0;padding:11px 13px;margin-bottom:11px;font-family:'Fraunces',serif;font-style:italic;font-size:14px;color:#2a5a2a;line-height:1.55;}
+.ref-lbl{font-size:10px;font-weight:700;letter-spacing:0.18em;text-transform:uppercase;color:#a8b8a8;margin:8px 0 6px;}
+.ref-level-row{display:flex;align-items:flex-start;gap:9px;padding:7px 0;border-bottom:1px solid #f5f2ef;}
+.ref-level-row:last-child{border-bottom:none;}
+.ref-pill{font-size:10px;font-weight:700;letter-spacing:0.07em;text-transform:uppercase;padding:3px 9px;border-radius:20px;flex-shrink:0;margin-top:2px;}
+.ref-level-text{font-size:13px;color:#4a6a4a;line-height:1.5;font-style:italic;font-family:'Fraunces',serif;}
+.ref-note{font-family:'Fraunces',serif;font-style:italic;font-size:13px;color:#4a6a4a;line-height:1.6;margin-top:6px;}
+
+/* QUEST */
+#quest-screen{background:#f7f3ee;}
+.quest-hero{padding:52px 22px 16px;background:linear-gradient(150deg,#1a3a28,#2d5a3a);}
+.quest-hero-title{font-family:'Fraunces',serif;font-size:30px;font-weight:300;font-style:italic;color:#fff;margin-bottom:3px;}
+.quest-hero-sub{font-size:13px;color:rgba(255,255,255,0.6);}
+.quest-body{padding:14px;}
+.today-q{background:linear-gradient(135deg,#2a5a2a,#3a8a3a);border-radius:18px;padding:18px 17px;margin-bottom:12px;position:relative;overflow:hidden;cursor:pointer;}
+.today-q::before{content:'';position:absolute;top:-28px;right:-28px;width:110px;height:110px;border-radius:50%;background:rgba(255,255,255,0.05);}
+.tq-eye{font-size:10px;font-weight:700;letter-spacing:0.26em;text-transform:uppercase;color:rgba(255,255,255,0.52);margin-bottom:5px;}
+.tq-txt{font-family:'Fraunces',serif;font-size:17px;color:#fff;line-height:1.3;margin-bottom:11px;}
+.tq-meta{display:flex;align-items:center;gap:9px;flex-wrap:wrap;}
+.tq-tag{background:rgba(255,255,255,0.14);border-radius:20px;padding:4px 11px;font-size:12px;color:rgba(255,255,255,0.88);font-weight:500;}
+.tq-hint{font-size:11px;color:rgba(255,255,255,0.55);font-style:italic;}
+.energy-block{background:#fff;border-radius:14px;padding:13px 15px;margin-bottom:12px;box-shadow:0 2px 8px rgba(0,0,0,0.05);}
+.energy-title{font-size:13px;font-weight:600;color:#2a4a2a;margin-bottom:7px;}
+.e-row{display:flex;gap:7px;margin-bottom:6px;}
+.e-row:last-child{margin-bottom:0;}
+.e-btn{flex:1;padding:8px 5px;text-align:center;background:#f5f2ef;border:1.5px solid transparent;color:#5a7a5a;font-family:'Nunito',sans-serif;font-size:12px;cursor:pointer;border-radius:9px;transition:all 0.15s;}
+.e-btn.on{background:#3a7a3a;border-color:#3a7a3a;color:#fff;font-weight:700;}
+.doors-lbl{font-size:11px;font-weight:700;letter-spacing:0.22em;text-transform:uppercase;color:#7a9a7a;margin-bottom:8px;}
+.door-card{background:#fff;border-radius:13px;padding:12px 14px;margin-bottom:7px;display:flex;align-items:center;gap:12px;cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,0.05);transition:all 0.15s;}
+.door-card:active{transform:translateX(4px);}
+.door-card.hidden{display:none;}
+.door-ico{font-size:22px;flex-shrink:0;}
+.door-text{flex:1;}
+.door-main{font-size:14px;color:#2a4a2a;font-weight:500;margin-bottom:1px;}
+.door-path{font-size:11px;color:#7a9a7a;font-style:italic;}
+.door-badge{font-size:10px;font-weight:700;letter-spacing:0.07em;text-transform:uppercase;padding:4px 10px;border-radius:20px;flex-shrink:0;}
+.b-q{background:#e4f4e8;color:#3a7a3a;}
+.b-s{background:#e0ecf8;color:#2a5a8a;}
+.b-d{background:#f0e8f8;color:#5a3a8a;}
+
+/* LOG */
+#log-screen{background:#f7f3ee;}
+.log-hero{padding:52px 22px 16px;background:linear-gradient(150deg,#2a2a4a,#3a3a6a);}
+.log-hero-title{font-family:'Fraunces',serif;font-size:30px;font-weight:300;font-style:italic;color:#fff;margin-bottom:3px;}
+.log-hero-sub{font-size:13px;color:rgba(255,255,255,0.6);}
+.log-body{padding:14px;}
+.log-reflection{background:#fff;border-radius:14px;padding:16px;margin-bottom:12px;box-shadow:0 2px 8px rgba(0,0,0,0.05);}
+.log-r-title{font-family:'Fraunces',serif;font-size:16px;color:#1a3020;margin-bottom:2px;}
+.log-r-sub{font-size:12px;color:#7a9a7a;font-style:italic;margin-bottom:12px;}
+.log-field-row{display:flex;gap:8px;margin-bottom:8px;}
+.log-select{flex:1;padding:9px 10px;border:1.5px solid #e0dbd4;border-radius:9px;font-family:'Nunito',sans-serif;font-size:13px;color:#2a4a2a;background:#faf8f5;cursor:pointer;appearance:none;-webkit-appearance:none;}
+.log-select:focus{outline:none;border-color:#5a9a6a;}
+.log-r-q{font-size:13px;color:#4a6a4a;margin-bottom:6px;line-height:1.5;}
+.log-textarea{width:100%;border:1.5px solid #e0dbd4;border-radius:9px;padding:10px 12px;font-family:'Fraunces',serif;font-style:italic;font-size:14px;color:#2a4a2a;background:#faf8f5;resize:none;min-height:72px;line-height:1.5;}
+.log-textarea:focus{outline:none;border-color:#5a9a6a;}
+.log-save-btn{margin-top:8px;width:100%;padding:12px;background:#2a5a2a;border:none;border-radius:11px;color:#fff;font-family:'Nunito',sans-serif;font-size:14px;font-weight:700;cursor:pointer;}
+.log-entries-lbl{font-size:11px;font-weight:700;letter-spacing:0.22em;text-transform:uppercase;color:#7a9a7a;margin-bottom:8px;}
+.log-empty{background:#fff;border-radius:14px;padding:24px;text-align:center;box-shadow:0 2px 8px rgba(0,0,0,0.05);}
+.log-empty-ico{font-size:38px;margin-bottom:10px;}
+.log-empty-txt{font-family:'Fraunces',serif;font-style:italic;font-size:15px;color:#7a9a7a;line-height:1.55;}
+.log-entry{background:#fff;border-radius:13px;padding:14px;margin-bottom:8px;box-shadow:0 2px 8px rgba(0,0,0,0.05);}
+.log-entry-head{display:flex;align-items:center;gap:9px;margin-bottom:6px;}
+.log-entry-ico{font-size:20px;flex-shrink:0;}
+.log-entry-meta{flex:1;}
+.log-entry-type{font-size:10px;font-weight:700;letter-spacing:0.15em;text-transform:uppercase;color:#7a9a7a;}
+.log-entry-where{font-size:11px;color:#5a7a9a;font-weight:600;}
+.log-entry-date{font-size:11px;color:#a8b8a8;}
+.log-entry-text{font-family:'Fraunces',serif;font-size:14px;color:#2a4a2a;line-height:1.5;}
+.log-entry-note{font-family:'Fraunces',serif;font-style:italic;font-size:13px;color:#5a8a5a;margin-top:5px;line-height:1.5;border-top:1px solid #f5f2ef;padding-top:6px;}
+
+/* CEREMONY OVERLAYS */
+#ov-trophy .sheet{text-align:center;}
+#ov-trophy .t-big{font-size:72px;display:block;margin-bottom:8px;animation:tropop 0.55s cubic-bezier(0.34,1.56,0.64,1) 0.15s both;position:relative;z-index:1;}
+@keyframes tropop{from{transform:scale(0) rotate(-12deg)}to{transform:scale(1) rotate(0)}}
+#ov-trophy .t-eye{font-size:10px;font-weight:700;letter-spacing:0.3em;text-transform:uppercase;color:#c4a040;margin-bottom:8px;position:relative;z-index:1;}
+#ov-trophy .t-title{font-family:'Fraunces',serif;font-size:22px;color:#1a3020;margin-bottom:9px;line-height:1.2;position:relative;z-index:1;}
+#ov-trophy .t-text{font-family:'Fraunces',serif;font-style:italic;font-size:15px;color:#4a6a4a;line-height:1.65;position:relative;z-index:1;}
+#ov-levelup .sheet{text-align:center;}
+#ov-levelup .lv-big{font-size:64px;display:block;margin-bottom:8px;animation:lvpop 0.6s cubic-bezier(0.34,1.56,0.64,1) 0.1s both;position:relative;z-index:1;}
+@keyframes lvpop{from{transform:scale(0) translateY(20px)}to{transform:scale(1) translateY(0)}}
+#ov-levelup .lv-eye{font-size:10px;font-weight:700;letter-spacing:0.3em;text-transform:uppercase;color:#3a7a3a;margin-bottom:6px;position:relative;z-index:1;}
+#ov-levelup .lv-title{font-family:'Fraunces',serif;font-size:22px;color:#1a3020;margin-bottom:10px;position:relative;z-index:1;}
+.lv-from-to{display:flex;align-items:center;justify-content:center;gap:10px;margin-bottom:14px;position:relative;z-index:1;}
+.lv-from{padding:5px 14px;border-radius:20px;font-size:12px;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;}
+.lv-arrow{font-size:16px;color:#5a9a6a;}
+.lv-to{padding:5px 14px;border-radius:20px;background:#eaf4ec;color:#2a6a2a;font-size:12px;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;}
+#ov-levelup .lv-text{font-family:'Fraunces',serif;font-style:italic;font-size:14px;color:#4a6a4a;line-height:1.65;position:relative;z-index:1;}
+</style>
+</head>
+<body>
+<div class="phone" id="phone">
+
+<!-- HOME -->
+<div class="screen" id="home">
+  <div class="sky">
+    <div class="sun"></div>
+    <div class="cloud" style="width:66px;height:16px;top:46px;left:420px;animation-duration:26s;animation-delay:-7s"></div>
+    <div class="cloud" style="width:40px;height:11px;top:72px;left:370px;animation-duration:20s;animation-delay:-2s;opacity:0.5"></div>
+    <div class="ground"></div>
+    <div class="garden-row" id="garden-row"></div>
+  </div>
+  <div class="home-meta">
+    <div class="home-date" id="home-date"></div>
+    <div class="home-title">Your <em>garden</em></div>
+  </div>
+  <div class="quest-strip" id="quest-strip-home" onclick="questDeepLink()">
+    <div class="qs-lbl">✦ Today's Quest</div>
+    <div class="qs-txt" id="quest-txt">Loading…</div>
+    <span class="qs-tag" id="quest-tag"></span>
+  </div>
+  <div class="section-lbl">Your Regions</div>
+  <div class="r-chips" id="region-chips"></div>
+</div>
+
+<!-- REGION -->
+<div class="screen off-right" id="region-screen">
+  <div class="region-hero" id="region-hero">
+    <div class="hero-deco" id="hero-deco"></div>
+    <button class="back-btn" onclick="goScreen('home')">←</button>
+    <div class="hero-content">
+      <div class="hero-eye">Life Map · Region</div>
+      <div class="hero-title" id="hero-title"></div>
+      <div class="hero-principle" id="hero-principle"></div>
+    </div>
+  </div>
+  <div id="path-cards-container"></div>
+</div>
+
+<!-- MAP -->
+<div class="screen off-right" id="map-screen">
+  <div class="map-hero">
+    <div class="map-hero-title">The Map</div>
+    <div class="map-hero-sub">All five regions · Your whole life</div>
+  </div>
+  <div class="map-body">
+    <div class="section-lbl" style="padding:4px 0 8px">All Regions</div>
+    <div id="map-legend"></div>
+    <div class="section-lbl" style="padding:16px 0 8px">🏆 All Trophies</div>
+    <div class="trophy-shelf">
+      <div style="font-size:12px;color:#7a9a7a;font-style:italic;margin-bottom:10px;font-family:'Fraunces',serif">Moments worth keeping. Tap any earned trophy to revisit it.</div>
+      <div class="shelf-grid" id="trophy-shelf-grid"></div>
+    </div>
+    <div class="section-lbl" style="padding:16px 0 8px">Principles & Context</div>
+    <div id="ref-sections"></div>
+  </div>
+</div>
+
+<!-- QUEST -->
+<div class="screen off-right" id="quest-screen">
+  <div class="quest-hero">
+    <div class="quest-hero-title">Today's Quest</div>
+    <div class="quest-hero-sub">One door, open right now</div>
+  </div>
+  <div class="quest-body">
+    <div class="today-q" id="today-q-card" onclick="questDeepLink()">
+      <div class="tq-eye" id="tq-date"></div>
+      <div class="tq-txt" id="tq-txt"></div>
+      <div class="tq-meta">
+        <span class="tq-tag" id="tq-tag"></span>
+        <span class="tq-hint">Tap to go there →</span>
+      </div>
+    </div>
+    <div class="energy-block">
+      <div class="energy-title">What do you bring today?</div>
+      <div class="e-row">
+        <button class="e-btn" data-energy="low" onclick="toggleE(this,'energy')">🌧 Low</button>
+        <button class="e-btn on" data-energy="medium" onclick="toggleE(this,'energy')">🌤 Medium</button>
+        <button class="e-btn" data-energy="high" onclick="toggleE(this,'energy')">🔋 High</button>
+      </div>
+      <div class="e-row">
+        <button class="e-btn on" data-time="quick" onclick="toggleE(this,'time')">⏱ Few mins</button>
+        <button class="e-btn" data-time="hour" onclick="toggleE(this,'time')">🕐 An hour</button>
+        <button class="e-btn" data-time="open" onclick="toggleE(this,'time')">🌿 Open</button>
+      </div>
+    </div>
+    <div class="doors-lbl">Open Doors Right Now</div>
+    <div id="open-doors"></div>
+  </div>
+</div>
+
+<!-- LOG -->
+<div class="screen off-right" id="log-screen">
+  <div class="log-hero">
+    <div class="log-hero-title">The Log</div>
+    <div class="log-hero-sub">A record of what you've found</div>
+  </div>
+  <div class="log-body">
+    <div class="log-reflection">
+      <div class="log-r-title">Today's reflection</div>
+      <div class="log-r-sub">Optional · Takes 2 minutes · Worth it</div>
+      <div class="log-field-row">
+        <select class="log-select" id="log-region-sel">
+          <option value="">Region…</option>
+          <option value="Creative Life">Creative Life</option>
+          <option value="Body">Body</option>
+          <option value="Mind">Mind</option>
+          <option value="Nourishment">Nourishment</option>
+          <option value="Connection">Connection</option>
+          <option value="General">General</option>
+        </select>
+        <select class="log-select" id="log-path-sel">
+          <option value="">Path…</option>
+          <option value="The Personal Practice">The Personal Practice</option>
+          <option value="The Seeking Life">The Seeking Life</option>
+          <option value="Inspiration Garden">Inspiration Garden</option>
+          <option value="Aesthetic Education">Aesthetic Education</option>
+          <option value="Adventure & Capability">Adventure & Capability</option>
+          <option value="Honoring the Body">Honoring the Body</option>
+          <option value="Joy & Expression">Joy & Expression</option>
+          <option value="The Foundation">The Foundation</option>
+        </select>
+      </div>
+      <div class="log-r-q">What's one thing you noticed — about the practice, yourself, or what you're making?</div>
+      <textarea class="log-textarea" id="log-input" placeholder="Write here…" rows="3"></textarea>
+      <button class="log-save-btn" onclick="saveReflection()">Save to log</button>
+    </div>
+    <div class="log-entries-lbl" style="display:flex;align-items:center;justify-content:space-between;padding-right:2px;">
+      <span>Your record</span>
+      <button onclick="confirmClearData()" style="font-size:11px;color:#c88a8a;background:none;border:none;cursor:pointer;font-family:'Nunito',sans-serif;font-weight:600;padding:4px 0;">Clear all data</button>
+    </div>
+    <div id="log-entries"></div>
+  </div>
+</div>
+
+<!-- NAV -->
+<div class="bnav">
+  <button class="nb on" id="nb-home" onclick="goScreen('home')"><span class="ni">🌿</span><span class="nl">Garden</span></button>
+  <button class="nb" id="nb-map" onclick="goScreen('map-screen')"><span class="ni">🗺</span><span class="nl">Map</span></button>
+  <button class="nb" id="nb-quest" onclick="goScreen('quest-screen')"><span class="ni">✦</span><span class="nl">Quest</span></button>
+  <button class="nb" id="nb-log" onclick="goScreen('log-screen')"><span class="ni">📓</span><span class="nl">Log</span></button>
+</div>
+
+<!-- OVERLAYS -->
+<div class="overlay" id="ov-trophy" onclick="closeOverlay('ov-trophy')">
+  <div class="confetti-wrap" id="conf-trophy"></div>
+  <div class="sheet" onclick="event.stopPropagation()">
+    <div class="sheet-handle"></div>
+    <span class="t-big" id="ov-t-icon"></span>
+    <div class="t-eye">Trophy Unlocked</div>
+    <div class="t-title" id="ov-t-title"></div>
+    <div class="t-text" id="ov-t-text"></div>
+    <button class="sheet-btn" style="background:#2a5a2a" onclick="claimTrophy()">Claim it</button>
+  </div>
+</div>
+<div class="overlay" id="ov-levelup" onclick="closeOverlay('ov-levelup')">
+  <div class="confetti-wrap" id="conf-levelup"></div>
+  <div class="sheet" onclick="event.stopPropagation()">
+    <div class="sheet-handle"></div>
+    <span class="lv-big" id="ov-lv-icon"></span>
+    <div class="lv-eye">Path Level Up</div>
+    <div class="lv-title" id="ov-lv-title"></div>
+    <div class="lv-from-to">
+      <span class="lv-from" id="ov-lv-from"></span>
+      <span class="lv-arrow">→</span>
+      <span class="lv-to" id="ov-lv-to"></span>
+    </div>
+    <div class="lv-text" id="ov-lv-text"></div>
+    <button class="sheet-btn" style="background:linear-gradient(135deg,#2a5a2a,#3a8a3a)" onclick="claimLevelUp()">Continue exploring</button>
+  </div>
+</div>
+
+<script>
+// ── DATA ──────────────────────────────
+const REGIONS={
+  creative:{id:'creative',name:'Creative Life',icon:'🎨',color:'linear-gradient(150deg,#1a3a28,#2d5a3a,#3a7a48)',chipColor:'#e84a8a',levelColor:'#3a7a3a',principle:'Nurture it like something growing, not manage it like something broken.',levels:['Seed','Awakening','Growing','Blooming'],levelDesc:['The building blocks are there — supplies, references, hunger. What\'s missing is the container.','A personal practice is taking shape. The nest exists. You\'re showing up with intention, even imperfectly.','The practice holds. The seeking life is active. You can feel your aesthetic developing.','The work surprises you. Structure and freedom are in conversation. You are visibly becoming who you\'re mapping toward.'],paths:['personal-practice','seeking-life','inspiration-garden','aesthetic-education']},
+  body:{id:'body',name:'Body',icon:'🌿',color:'linear-gradient(150deg,#1a2a3a,#2a4a6a,#2a5a8a)',chipColor:'#4a8ae8',levelColor:'#2a6a8a',principle:'Ignition first, consistency second. Your body came first — all of this came after.',levels:['Disconnected','Returning','Present','Embodied'],levelDesc:['The body is there but not attended to. Moving through days mostly in your head.','You\'re turning back toward it — not perfectly, not consistently, but the direction has shifted.','Movement, rest, and pleasure are becoming real things you return to. The animal ease is coming back.','Your body is part of your life, not a problem to solve or a resource to manage. It just is.'],paths:['adventure-capability','honoring-body','joy-expression','the-foundation']},
+  mind:{id:'mind',name:'Mind',icon:'🧠',color:'linear-gradient(150deg,#1a2a1a,#2a4a3a,#3a6a4a)',chipColor:'#5a9a6a',levelColor:'#3a7a4a',principle:'Keep the well full. Hunger is the signal, not the problem.',levels:['Frantic','Returning','Fed','Alive'],levelDesc:['The hunger is there but the food is wrong. Doomscrolling, starting things in the middle, frantic unsatisfied seeking.','You\'re beginning to tend the conditions. The reading windows exist. Some threads are alive.','The well is regularly filled. The curriculum has shape. Attention is a practice you maintain.','When things are working, your mind is hungry and there is food everywhere. The world feels rich.'],paths:['reading-life','living-curriculum','practice-attention']},
+  nourishment:{id:'nourishment',name:'Nourishment',icon:'🌱',color:'linear-gradient(150deg,#1a3a1a,#2a5a2a,#3a7a3a)',chipColor:'#6aaa4a',levelColor:'#4a8a2a',principle:'Permissions, not plans.',levels:['Getting By','Tending','Nourished','Flourishing'],levelDesc:['The basics are there but not tended. The home works, the food is fine, but nothing feels intentional.','You\'re beginning to make it yours — small improvements, a kitchen that works better, dressing with intention.','Daily life genuinely feeds you. The home is sanctuary. The body is tended. Style is becoming expression.','The whole environment — home, food, appearance, sensory life — reflects who you are and supports who you\'re becoming.'],paths:['home-sanctuary','feeding-yourself','sensory-life']},
+  connection:{id:'connection',name:'Connection',icon:'🤝',color:'linear-gradient(150deg,#3a1a1a,#5a2a2a,#7a3a2a)',chipColor:'#e87a4a',levelColor:'#8a3a2a',principle:'Use this time to become someone you\'d love to connect with. The rest follows.',levels:['Contracted','Present','Reaching','Open'],levelDesc:['Energy is spoken for. Connection beyond your immediate people isn\'t possible right now. That\'s not failure — that\'s reality.','You\'re showing up fully for the people who need you. The reserves are being managed. Gentle reach is happening.','You\'re becoming. The work in every other region is connection work too. The longer horizon is real.','You arrived. The season turned. You came through it more yourself, not less.'],paths:['your-people','gentle-reach','becoming']}
+};
+
+const PATHS={
+  'personal-practice':{id:'personal-practice',regionId:'creative',name:'The Personal Practice',icon:'🪴',tagline:'The nest · Two modes · Evenings',color:'#3a8a5a',bgColor:'#e8f4ec',textColor:'#3a7a4a',principle:'The container enables the abandon. Decide before you sit down so that once you\'re in, you can just be in.',levels:['Dormant','Awakening','Fluent','Alive'],levelDesc:['The building blocks are there but no container yet. Making happens in bursts, not from a place.','The nest exists. You\'re showing up with a prepared focus, however imperfectly.','The two modes move freely. You arrive knowing what you\'re doing, and sometimes the practice surprises you.','The practice is simply part of who you are now. You miss it when it\'s gone.'],xp:0,maxXp:40,currentLevel:0,rooms:[
+    {id:'pp-cr1',type:'common',text:'Set up the lap desk situation',xp:1,energy:'quick',time:'quick'},
+    {id:'pp-cr2',type:'common',text:'Prepare tomorrow\'s focus before closing for the night',xp:1,energy:'quick',time:'quick'},
+    {id:'pp-cr3',type:'common',text:'An evening drawing session, however short',xp:1,energy:'medium',time:'hour'},
+    {id:'pp-cr4',type:'common',text:'Notice which mode you arrive in — fundamentals or expression',xp:1,energy:'quick',time:'quick'},
+    {id:'pp-cr5',type:'common',text:'End the session before you\'re depleted',xp:1,energy:'quick',time:'quick'},
+    {id:'pp-s1',type:'step',text:'Solve the physical nest — lap desk, supplies organized',xp:2,energy:'medium',time:'hour'},
+    {id:'pp-s2',type:'step',text:'Establish the prepared focus ritual',xp:2,energy:'medium',time:'quick'},
+    {id:'pp-s3',type:'step',text:'Build a personal fundamentals curriculum',xp:2,energy:'high',time:'open'},
+    {id:'pp-s4',type:'step',text:'First week of consistent evening sessions',xp:2,energy:'medium',time:'hour'},
+    {id:'pp-r1',type:'rare',text:'A page that works in a way you don\'t fully understand yet',xp:5,energy:'any',time:'any'},
+    {id:'pp-r2',type:'rare',text:'A fundamentals drill that cracks something open',xp:5,locked:true,lockHint:'Unlocks after establishing curriculum',energy:'any',time:'any'},
+    {id:'pp-r3',type:'rare',text:'Losing track of time — arriving back from somewhere',xp:5,locked:true,lockHint:'Unlocks after a month of practice',energy:'any',time:'any'},
+    {id:'pp-t1',type:'trophy',icon:'🪴',text:'The nest is built',xp:10,ceremony:'The lap desk is there. The supplies are within reach. The ritual exists. You\'ve made a place in your life that belongs to the practice.'},
+    {id:'pp-t2',type:'trophy',icon:'🗺',text:'A fundamentals curriculum mapped and begun',xp:10,locked:true,lockHint:'Unlocks after establishing the practice',ceremony:'You know what you\'re building toward. The map is drawn. The rest is just walking it.'},
+    {id:'pp-t3',type:'trophy',icon:'🎯',text:'The practice holds for a full month',xp:10,locked:true,lockHint:'Unlocks after 4 weeks of practice',ceremony:'A month is longer than it sounds. Something has taken root.'},
+    {id:'pp-t4',type:'trophy',icon:'✨',text:'A drawing that couldn\'t have existed six months ago',xp:15,locked:true,lockHint:'Unlocks at Fluent',ceremony:'You can see the distance between here and where you started. That\'s the practice working.'}
+  ],lvlUpBanner:{icon:'🌸',from:'Awakening',to:'Fluent',text:'Something has settled. The two modes move freely between each other now. You arrive knowing what you\'re doing, and sometimes the practice surprises you with something you didn\'t plan.'}},
+
+  'seeking-life':{id:'seeking-life',regionId:'creative',name:'The Seeking Life',icon:'🔭',tagline:'Beauty hunting · Aesthetic map · Cinema',color:'#2a5a8a',bgColor:'#e4eef8',textColor:'#2a5a8a',principle:'Seek as seriously as you study. The input is not optional — it\'s half the work.',levels:['Dormant','Awakening','Mapping','Navigating'],levelDesc:['You encounter things and recognize them. The seeking is passive, not yet intentional.','You\'re beginning to seek actively. Trusted voices are emerging. The thread is being followed.','Your aesthetic map is taking shape. You can predict what will move you. Film is deliberate.','You know where beauty lives for you specifically. The seeking is as natural as breathing.'],xp:0,maxXp:20,currentLevel:0,rooms:[
+    {id:'sl-cr1',type:'common',text:'Follow the thread when something hits',xp:1,energy:'quick',time:'quick'},
+    {id:'sl-cr2',type:'common',text:'Balance background watching with fully immersive cinema',xp:1,energy:'low',time:'open'},
+    {id:'sl-cr3',type:'common',text:'Notice and name what moved you — even briefly',xp:1,energy:'quick',time:'quick'},
+    {id:'sl-cr4',type:'common',text:'Let the work film project teach you something about film as aesthetic',xp:1,energy:'medium',time:'hour'},
+    {id:'sl-s1',type:'step',text:'Study 2–3 artists whose work you hold tightly — properly, not just admiringly',xp:2,energy:'high',time:'open'},
+    {id:'sl-s2',type:'step',text:'Find critics or curators whose taste you trust',xp:2,energy:'medium',time:'hour'},
+    {id:'sl-s3',type:'step',text:'Go somewhere specifically to look at something',xp:2,energy:'medium',time:'open'},
+    {id:'sl-s4',type:'step',text:'Map your own aesthetic — written or visual',xp:2,energy:'high',time:'open'},
+    {id:'sl-r1',type:'rare',text:'A singular encounter that stays with you for months',xp:5,energy:'any',time:'any'},
+    {id:'sl-r2',type:'rare',text:'Recognizing your aesthetic territory outside your usual medium',xp:5,locked:true,lockHint:'Unlocks at Awakening',energy:'any',time:'any'},
+    {id:'sl-r3',type:'rare',text:'Finding someone whose taste mirrors yours — a trusted voice',xp:5,locked:true,lockHint:'Unlocks at Mapping',energy:'any',time:'any'},
+    {id:'sl-t1',type:'trophy',icon:'✨',text:'An artist properly studied — not just admired',xp:10,ceremony:'You went past the surface. You looked at how it\'s made, not just that you love it. That\'s a different kind of seeing.'},
+    {id:'sl-t2',type:'trophy',icon:'🎬',text:'A film watched with full attention that changes something',xp:10,locked:true,lockHint:'Unlocks at Awakening',ceremony:'Film stopped being background. It became something you look at, not through.'},
+    {id:'sl-t3',type:'trophy',icon:'🧭',text:'An aesthetic map — written or visual',xp:15,locked:true,lockHint:'Unlocks at Mapping',ceremony:'You can describe what you\'re drawn to. That\'s not a small thing.'}
+  ]},
+
+  'inspiration-garden':{id:'inspiration-garden',regionId:'creative',name:'Inspiration Garden',icon:'🗂️',tagline:'Visual collection · Eight boards · Capture & view',color:'#8a5a2a',bgColor:'#f8ece4',textColor:'#7a4a2a',principle:'The collection is only as good as how it feels to return to it. Build for the viewing experience, not just the saving.',levels:['Unbuilt','Establishing','Rich','Living'],levelDesc:['Things get saved and disappear. The camera roll swallows them. No container yet.','The boards exist. The habit is forming. The collection is beginning to accumulate.','The boards have enough in them to be genuinely useful. Opening them shifts something.','The collection is a living document of your aesthetic life. It surprises you when you return to it.'],xp:0,maxXp:16,currentLevel:0,rooms:[
+    {id:'ig-cr1',type:'common',text:'Save something when it hits — immediately, not later',xp:1,energy:'quick',time:'quick'},
+    {id:'ig-cr2',type:'common',text:'Photograph something beautiful you encounter in real life',xp:1,energy:'quick',time:'quick'},
+    {id:'ig-cr3',type:'common',text:'Return to the boards before a drawing session',xp:1,energy:'quick',time:'quick'},
+    {id:'ig-s1',type:'step',text:'Choose the right container — Are, Milanote, or private Instagram',xp:2,energy:'medium',time:'hour'},
+    {id:'ig-s2',type:'step',text:'Set up all eight boards: Faces & Figures · Color · Light & Shadow · Shapes · Nature · Jewelry · Crafts · Digital',xp:2,energy:'medium',time:'hour'},
+    {id:'ig-s3',type:'step',text:'First pass migration from camera roll',xp:2,energy:'medium',time:'open'},
+    {id:'ig-r1',type:'rare',text:'Your own photograph becomes reference for a drawing',xp:5,locked:true,lockHint:'Unlocks after establishing saving habit',energy:'any',time:'any'},
+    {id:'ig-r2',type:'rare',text:'A board reveals a pattern you didn\'t consciously choose',xp:5,locked:true,lockHint:'Unlocks after boards are rich',energy:'any',time:'any'},
+    {id:'ig-t1',type:'trophy',icon:'🌸',text:'The right container found and boards established',xp:10,ceremony:'The place exists. The first things are in it. The collection has begun.'},
+    {id:'ig-t2',type:'trophy',icon:'🪞',text:'A drawing traceable back to something in the collection',xp:10,locked:true,lockHint:'Unlocks at Rich',ceremony:'The collection fed the work. That\'s the whole point of it.'}
+  ]},
+
+  'aesthetic-education':{id:'aesthetic-education',regionId:'creative',name:'Aesthetic Education',icon:'📚',tagline:'Reading · Studying · Feeding the practice',color:'#7a4a8a',bgColor:'#f0e8f8',textColor:'#6a4a8a',principle:'Learning is part of the creative practice, not a break from it. Give it its own time so it doesn\'t steal from the making.',levels:['Curious','Studying','Deep','Integrated'],levelDesc:['You read about making. You save tutorials. The learning is sporadic, interest-led.','The learning has structure. You\'re building toward something specific, not just following curiosity.','The membrane between study and practice is permeable. Learning shows up in the hand.','You can\'t separate the education from the practice anymore. They\'re the same thing.'],xp:0,maxXp:22,currentLevel:0,rooms:[
+    {id:'ae-cr1',type:'common',text:'Read or watch something craft-related, however briefly',xp:1,energy:'low',time:'quick'},
+    {id:'ae-cr2',type:'common',text:'Keep a short note when something lands',xp:1,energy:'quick',time:'quick'},
+    {id:'ae-cr3',type:'common',text:'Let learning inform without forcing application',xp:1,energy:'low',time:'quick'},
+    {id:'ae-cr4',type:'common',text:'Return to a reference during a drawing session',xp:1,energy:'quick',time:'quick'},
+    {id:'ae-s1',type:'step',text:'Finish the film editing book — carry something forward from it',xp:2,energy:'low',time:'open'},
+    {id:'ae-s2',type:'step',text:'Find the best anatomy resource for a loose expressive aesthetic',xp:2,energy:'medium',time:'hour'},
+    {id:'ae-s3',type:'step',text:'Study a loved artist technically — understand how they do what they do',xp:2,energy:'high',time:'open'},
+    {id:'ae-r1',type:'rare',text:'Something read shows up in your hand without planning',xp:5,energy:'any',time:'any'},
+    {id:'ae-r2',type:'rare',text:'Understanding technically something you\'ve been doing intuitively',xp:5,locked:true,lockHint:'Unlocks at Studying',energy:'any',time:'any'},
+    {id:'ae-r3',type:'rare',text:'Film education and drawing education cross-pollinate unexpectedly',xp:5,locked:true,lockHint:'Unlocks at Deep',energy:'any',time:'any'},
+    {id:'ae-t1',type:'trophy',icon:'📖',text:'Film editing book finished — something carried forward',xp:10,ceremony:'You finished it and brought something back. The book did its job.'},
+    {id:'ae-t2',type:'trophy',icon:'🔬',text:'A learning that visibly changed what the hand does',xp:10,locked:true,lockHint:'Unlocks at Deep',ceremony:'There\'s a before and an after. You can see it in the work.'}
+  ]},
+
+  'adventure-capability':{id:'adventure-capability',regionId:'body',name:'Adventure & Capability',icon:'🥾',tagline:'Boxing · Hiking with your son · Capability first',color:'#2a6a8a',bgColor:'#e0ecf8',textColor:'#1a5a7a',principle:'Build the body that can do what you want to do. Capability is the point, not the means.',levels:['Curious','Committed','Capable','Adventurous'],levelDesc:['The desire is there — to be capable, to explore, to share that with your son. Not yet in motion.','Something has started. The first hike is planned or done. The body is being asked to do things.','You\'re reliably capable of showing up for adventure. The body doesn\'t feel like a limitation.','Adventure is woven into life. You and your son have traditions. Italy isn\'t hypothetical.'],xp:0,maxXp:30,currentLevel:0,rooms:[
+    {id:'ac-cr1',type:'common',text:'Do something that requires your body to be capable',xp:1,energy:'medium',time:'hour'},
+    {id:'ac-cr2',type:'common',text:'Talk with your son about something you could do together',xp:1,energy:'quick',time:'quick'},
+    {id:'ac-cr3',type:'common',text:'Notice what capability you want that you don\'t have yet',xp:1,energy:'quick',time:'quick'},
+    {id:'ac-s1',type:'step',text:'Book the first hike with your son',xp:2,energy:'quick',time:'quick'},
+    {id:'ac-s2',type:'step',text:'Complete the first hike',xp:2,energy:'high',time:'open'},
+    {id:'ac-s3',type:'step',text:'Make the hiking a tradition — a second one planned before the first is done',xp:2,energy:'quick',time:'quick'},
+    {id:'ac-s4',type:'step',text:'Plan a destination hike — somewhere that requires building toward it',xp:2,energy:'medium',time:'hour'},
+    {id:'ac-r1',type:'rare',text:'Your son suggests the next adventure before you do',xp:5,locked:true,lockHint:'Hidden until after first hike completed',energy:'any',time:'any'},
+    {id:'ac-r2',type:'rare',text:'A tango class — the rare room that was always waiting',xp:5,locked:true,lockHint:'Hidden until partner dance begins',energy:'any',time:'any'},
+    {id:'ac-t1',type:'trophy',icon:'👟',text:'First hike booked',xp:5,ceremony:'The date exists on a calendar. That\'s a different thing from wanting to.'},
+    {id:'ac-t2',type:'trophy',icon:'🥾',text:'First hike done — you and your son',xp:10,ceremony:'You did it. And he was there. That\'s the whole thing right there.'},
+    {id:'ac-t3',type:'trophy',icon:'🌍',text:'A tradition with your son',xp:10,locked:true,lockHint:'Unlocks after two hikes done',ceremony:'It\'s not a one-off anymore. It\'s something you do together.'},
+    {id:'ac-t4',type:'trophy',icon:'🗻',text:'A destination hike — somewhere that meant building toward it',xp:15,locked:true,lockHint:'Unlocks at Capable',ceremony:'The body got you somewhere worth going.'}
+  ]},
+
+  'honoring-body':{id:'honoring-body',regionId:'body',name:'Honoring the Body',icon:'🌊',tagline:'Morning stretch · Afternoon break · Evening release · Sleep',color:'#2a7a6a',bgColor:'#e0f4f0',textColor:'#1a6a5a',principle:'This is homecoming, not fixing. The animal ease is still there — you\'ve just been living above it.',levels:['Disconnected','Returning','Present','Embodied'],levelDesc:['Most of the day happens in your head. The body is transport.','The check-ins are starting. You\'re becoming aware of what you\'ve been carrying.','You have rituals that return you to your body. They happen most days.','There\'s no separation anymore. The body is part of how you move through everything.'],xp:0,maxXp:28,currentLevel:0,rooms:[
+    {id:'hb-cr1',type:'common',text:'A morning stretch — even just lying there stretching before getting up',xp:1,energy:'low',time:'quick'},
+    {id:'hb-cr2',type:'common',text:'An afternoon break that involves moving away from the screen',xp:1,energy:'low',time:'quick'},
+    {id:'hb-cr3',type:'common',text:'An evening release — something that lets the day out of your body',xp:1,energy:'low',time:'quick'},
+    {id:'hb-cr4',type:'common',text:'Lie down before sleep instead of just collapsing',xp:1,energy:'low',time:'quick'},
+    {id:'hb-cr5',type:'common',text:'Notice what you\'re carrying in your shoulders or jaw or chest',xp:1,energy:'low',time:'quick'},
+    {id:'hb-s1',type:'step',text:'Establish a morning ritual — whatever form it takes',xp:2,energy:'medium',time:'hour'},
+    {id:'hb-s2',type:'step',text:'Build an afternoon break into the workday',xp:2,energy:'medium',time:'hour'},
+    {id:'hb-s3',type:'step',text:'Find what works for evening release — movement, heat, stillness',xp:2,energy:'medium',time:'hour'},
+    {id:'hb-r1',type:'rare',text:'A moment of animal ease — fully in the body, nowhere else',xp:5,energy:'any',time:'any'},
+    {id:'hb-r2',type:'rare',text:'Something you\'ve been carrying for months finally leaves',xp:5,locked:true,lockHint:'Unlocks at Returning',energy:'any',time:'any'},
+    {id:'hb-t1',type:'trophy',icon:'🌅',text:'A morning ritual that feels like returning, not performing',xp:10,ceremony:'The morning belongs to you now, before anything else asks for it.'},
+    {id:'hb-t2',type:'trophy',icon:'💤',text:'A week of actual sleep — not just hours but quality',xp:10,locked:true,lockHint:'Unlocks at Present',ceremony:'The sleep changed something. You noticed what you\'d been missing.'}
+  ]},
+
+  'joy-expression':{id:'joy-expression',regionId:'body',name:'Joy & Expression',icon:'💃',tagline:'African dance · Tango on the horizon · The body as expression',color:'#8a2a5a',bgColor:'#f8e4ee',textColor:'#7a2a4a',principle:'The body knows how to do this. It just needs to be asked.',levels:['Dormant','Awakening','Fluent','Abandoned (the good kind)'],levelDesc:['The desire to move expressively is there but hasn\'t found its place yet.','You\'ve started. The African dance class or something like it. Your body is remembering.','Movement is a regular joy. You don\'t have to convince yourself to go.','Abandoned in the best sense — the body just moves when it wants to now. No friction.'],xp:0,maxXp:24,currentLevel:0,rooms:[
+    {id:'je-cr1',type:'common',text:'Put on music and let your body respond — even for one song',xp:1,energy:'low',time:'quick'},
+    {id:'je-cr2',type:'common',text:'Notice what kind of movement feels like expression vs exercise',xp:1,energy:'quick',time:'quick'},
+    {id:'je-cr3',type:'common',text:'Move in a way that has nothing to do with fitness',xp:1,energy:'medium',time:'quick'},
+    {id:'je-s1',type:'step',text:'Attend the African dance class you\'ve identified',xp:2,energy:'high',time:'open'},
+    {id:'je-s2',type:'step',text:'Go back — make it not a one-time thing',xp:2,energy:'high',time:'open'},
+    {id:'je-s3',type:'step',text:'A home practice — something between classes',xp:2,energy:'medium',time:'hour'},
+    {id:'je-r1',type:'rare',text:'The class where it clicks — the body stops thinking and starts moving',xp:5,locked:true,lockHint:'Unlocks after attending first class',energy:'any',time:'any'},
+    {id:'je-r2',type:'rare',text:'Tango — the rare room that opens when the time is right',xp:5,locked:true,lockHint:'Hidden until partner dance begins',energy:'any',time:'any'},
+    {id:'je-t1',type:'trophy',icon:'🎭',text:'First African dance class attended',xp:10,ceremony:'You went. Whatever it was, you showed up and your body was there.'},
+    {id:'je-t2',type:'trophy',icon:'💃',text:'Dance becomes something you return to without convincing',xp:15,locked:true,lockHint:'Unlocks at Fluent',ceremony:'The friction is gone. The body knows this is good and just does it.'}
+  ]},
+
+  'the-foundation':{id:'the-foundation',regionId:'body',name:'The Foundation',icon:'🏗️',tagline:'Strength · Bone health · Heart health · Longevity',color:'#4a3a7a',bgColor:'#ece8f8',textColor:'#3a2a6a',principle:'This is the infrastructure. Not the point — what makes all the other things possible.',levels:['Unbuilt','Establishing','Consistent','Integrated'],levelDesc:['The intention is there. The foundation hasn\'t been laid yet.','Something structural is happening. Not consistent yet, but real.','The foundational work happens most weeks. The body is building.','The foundation is just how you live. Not a program — a given.'],xp:0,maxXp:28,currentLevel:0,hasEmergency:true,rooms:[
+    {id:'tf-cr1',type:'common',text:'One strength session this week',xp:1,energy:'high',time:'hour'},
+    {id:'tf-cr2',type:'common',text:'Something that gets your heart rate up for 20 minutes',xp:1,energy:'medium',time:'hour'},
+    {id:'tf-cr3',type:'common',text:'Eat in a way that feels like taking care of yourself, not just eating',xp:1,energy:'quick',time:'quick'},
+    {id:'tf-s1',type:'step',text:'Establish what the foundation looks like for your life specifically',xp:2,energy:'medium',time:'hour'},
+    {id:'tf-s2',type:'step',text:'Build strength training into the week — whatever form, whatever frequency',xp:2,energy:'high',time:'open'},
+    {id:'tf-s3',type:'step',text:'Address the bone health piece — find out what you need',xp:2,energy:'medium',time:'hour'},
+    {id:'tf-s4',type:'step',text:'Establish the heart health baseline — know your numbers',xp:2,energy:'medium',time:'hour'},
+    {id:'tf-r1',type:'rare',text:'The week where all the pieces line up without effort',xp:5,locked:true,lockHint:'Unlocks at Consistent',energy:'any',time:'any'},
+    {id:'tf-t1',type:'trophy',icon:'🏗️',text:'The foundation defined — what it is for your actual life',xp:10,ceremony:'You know what you\'re building. Not someone else\'s version — yours.'},
+    {id:'tf-t2',type:'trophy',icon:'💪',text:'Three months of consistent foundational work',xp:15,locked:true,lockHint:'Unlocks at Consistent',ceremony:'Three months is real. The body has changed. Something is different now.'}
+  ],
+  emergency:{
+    principle:'The ADHD body has a particular relationship with injury and collapse. One missed week becomes a story. The story becomes a truth. The truth becomes a wall. None of this is inevitable — but it\'s predictable, which means you can have a plan.',
+    context:'This isn\'t about motivation or discipline. It\'s about having an architecture ready before you need it, so when the collapse happens — and it will, because that\'s just how this works — you\'re not starting from scratch. You\'re using a map you already drew.',
+    phases:[
+      {title:'When it first collapses',steps:['Notice the story you\'re telling yourself. "I\'ve fallen off" is a story, not a fact. "I\'m not someone who can maintain this" is a story, not a fact. Stories can be put down.','Name it as a detour, not a destination. The path is still there. You\'re just not on it right now. That\'s different from having left it forever.']},
+      {title:'Finding the way back',steps:['Find the smallest open door — not the full practice, the one smallest thing still possible. Five minutes of stretching. One song. A single walk. The door doesn\'t have to be the right door, just an open one.','Don\'t try to make up for lost time. The body doesn\'t work on debt. Start where you are, not where you were.']},
+      {title:'Setting the return trigger',steps:['Concrete beats vague. Not "when I feel better" but "when the cast comes off." Not "soon" but "next Monday." The trigger should be specific enough that you\'d know when it happens.','Tell someone. The return is more real when it\'s said out loud to another person, even casually.']},
+    ],
+    note:'The pattern — feast, collapse, shame, wall — is recognizable. Recognizing it is most of the work. Once you know the shape of it, you can meet it earlier, at the story stage, before it becomes architecture.'
+  }},
+
+  'reading-life':{id:'reading-life',regionId:'mind',name:'The Reading Life',icon:'📖',tagline:'Morning window · Evening window · Third book',color:'#3a6a5a',bgColor:'#e4f0ec',textColor:'#2a5a4a',principle:'The appetite is there, the books are there, the structure makes sense. You just need the containers protected.',levels:['Drifting','Windowed','Protected','Flowing'],levelDesc:['Reading happens when it happens. The lull between books becomes a black hole.','The two windows exist. The rhythm is forming, imperfectly.','All three slots are protected. The lull has a protocol. The environment does the work.','The reading life runs without effort. It\'s just part of how your days are shaped.'],xp:0,maxXp:24,currentLevel:0,rooms:[
+    {id:'rl-cr1',type:'common',text:'Morning reading window — thought provoking',xp:1,energy:'low',time:'quick'},
+    {id:'rl-cr2',type:'common',text:'Evening reading window — emotional/beautiful',xp:1,energy:'low',time:'quick'},
+    {id:'rl-cr3',type:'common',text:'Third book finding its pocket — lunch, weekend, wherever there\'s space',xp:1,energy:'low',time:'quick'},
+    {id:'rl-cr4',type:'common',text:'Next book queued before finishing the current one',xp:1,energy:'quick',time:'quick'},
+    {id:'rl-cr5',type:'common',text:'Environment doing the work — book present, phone elsewhere, calm energy',xp:1,energy:'quick',time:'quick'},
+    {id:'rl-cr6',type:'common',text:'Scrolling has a designated home — it belongs somewhere, so it stays there',xp:1,energy:'quick',time:'quick'},
+    {id:'rl-s1',type:'step',text:'Identify what\'s encroaching on the morning window — and address it',xp:2,energy:'medium',time:'hour'},
+    {id:'rl-s2',type:'step',text:'Identify what\'s encroaching on the evening window — and address it',xp:2,energy:'medium',time:'hour'},
+    {id:'rl-s3',type:'step',text:'Find the pocket for the third book',xp:2,energy:'medium',time:'quick'},
+    {id:'rl-s4',type:'step',text:'Give scrolling a designated home — a time and place where it belongs',xp:2,energy:'medium',time:'quick'},
+    {id:'rl-s5',type:'step',text:'Build the lull protocol — know what you reach for when you\'re between books',xp:2,energy:'medium',time:'hour'},
+    {id:'rl-s6',type:'step',text:'Audit the physical environment — right book, right place, right time',xp:2,energy:'medium',time:'hour'},
+    {id:'rl-u1',type:'upgrade',text:'Morning window becomes non-negotiable — the day feels wrong without it',xp:3,energy:'any',time:'any'},
+    {id:'rl-u2',type:'upgrade',text:'Next book always waiting — the lull never gets a foothold',xp:3,locked:true,lockHint:'Unlocks after lull protocol built',energy:'any',time:'any'},
+    {id:'rl-u3',type:'upgrade',text:'Evening reading replaces scrolling without effort — the environment is doing the work',xp:3,locked:true,lockHint:'Unlocks at Windowed',energy:'any',time:'any'},
+    {id:'rl-u4',type:'upgrade',text:'Third book stops feeling like a bonus and starts feeling like a necessity',xp:3,locked:true,lockHint:'Unlocks at Protected',energy:'any',time:'any'},
+    {id:'rl-r1',type:'rare',text:'A book genuinely changes something',xp:5,energy:'any',time:'any'},
+    {id:'rl-r2',type:'rare',text:'A connection between what you\'re reading and another region — it crossed over',xp:5,energy:'any',time:'any'},
+    {id:'rl-r3',type:'rare',text:'All three books converge unexpectedly — the same idea in three different forms',xp:5,locked:true,lockHint:'Unlocks at Protected',energy:'any',time:'any'},
+    {id:'rl-r4',type:'rare',text:'The lull arrives and the protocol works',xp:5,locked:true,lockHint:'Unlocks after lull protocol built',energy:'any',time:'any'},
+    {id:'rl-t1',type:'trophy',icon:'📚',text:'All three windows established and protected',xp:10,ceremony:'The containers exist. The reading life has a shape.'},
+    {id:'rl-t2',type:'trophy',icon:'🔖',text:'The lull protocol built and tested — you\'ve been between books and didn\'t lose the practice',xp:10,locked:true,lockHint:'Unlocks after lull protocol built',ceremony:'The gap didn\'t become a black hole. You had a door and you used it.'},
+    {id:'rl-t3',type:'trophy',icon:'✨',text:'A year of reading you can look back on — you can name what you read and what it did',xp:15,locked:true,lockHint:'Unlocks at Flowing',ceremony:'A year. That\'s a reading life, not a reading habit.'}
+  ]},
+
+  'living-curriculum':{id:'living-curriculum',regionId:'mind',name:'The Living Curriculum',icon:'🕸️',tagline:'Following what\'s alive · Nine threads · The web of connections',color:'#4a7a3a',bgColor:'#ecf4e4',textColor:'#3a6a2a',principle:'You don\'t need a curriculum. You need a container for what the curriculum is becoming.',levels:['Scattered','Mapped','Threading','Alive'],levelDesc:['Learning is fully reactive — interesting things get saved, rabbit holes get followed, but nothing connects.','The waiting map exists. You know what\'s alive and what\'s waiting. Some threads have a container.','Two or more threads are developing together. Connections are appearing.','The web of connections is visible and alive. Learning one thing changes how you see another.'],xp:0,maxXp:30,currentLevel:0,rooms:[
+    {id:'lc-cr1',type:'common',text:'Follow the associative pull without guilt — one thing leading to another is the method',xp:1,energy:'low',time:'quick'},
+    {id:'lc-cr2',type:'common',text:'Leave breadcrumbs — a short note, a saved link, a sentence about why something mattered',xp:1,energy:'quick',time:'quick'},
+    {id:'lc-cr3',type:'common',text:'Return to the waiting map — what\'s alive, what\'s gone quiet, what wants to be next',xp:1,energy:'quick',time:'quick'},
+    {id:'lc-cr4',type:'common',text:'Writing things out as thinking — not note-taking, writing to understand',xp:1,energy:'medium',time:'hour'},
+    {id:'lc-s1',type:'step',text:'Choose a container for the loose syllabus',xp:2,energy:'medium',time:'hour'},
+    {id:'lc-s2',type:'step',text:'Choose a container for your breadcrumbs',xp:2,energy:'medium',time:'hour'},
+    {id:'lc-s3',type:'step',text:'Name what\'s currently alive — one or two threads that are lit up right now',xp:2,energy:'quick',time:'quick'},
+    {id:'lc-s4',type:'step',text:'Do a first pass on Italian — explore alternatives to Duolingo, find one that feels like discovery',xp:2,energy:'medium',time:'hour'},
+    {id:'lc-s5',type:'step',text:'Find the near horizon for Italy — something concrete enough to make the language feel necessary',xp:2,energy:'medium',time:'hour'},
+    {id:'lc-s6',type:'step',text:'Let one thread develop into a loose syllabus — follow it far enough that a shape emerges',xp:2,energy:'high',time:'open'},
+    {id:'lc-s7',type:'step',text:'Find the overlap between threads — where does film language touch anatomy, where does psychology and technology converge',xp:2,energy:'high',time:'open'},
+    {id:'lc-u1',type:'upgrade',text:'The loose syllabus starts to feel like a map — you can see where you\'ve been and where you want to go',xp:3,energy:'any',time:'any'},
+    {id:'lc-u2',type:'upgrade',text:'Two threads cross-pollinate unexpectedly — a connection you didn\'t plan',xp:3,locked:true,lockHint:'Unlocks at Threading',energy:'any',time:'any'},
+    {id:'lc-u3',type:'upgrade',text:'A slow burn thread finds its ignition — something makes it feel like a door rather than a background hum',xp:3,locked:true,lockHint:'Unlocks at Mapped',energy:'any',time:'any'},
+    {id:'lc-u4',type:'upgrade',text:'The breadcrumb habit becomes automatic — you capture without deciding to',xp:3,locked:true,lockHint:'Unlocks at Threading',energy:'any',time:'any'},
+    {id:'lc-r1',type:'rare',text:'A rabbit hole that produces something you can actually use — in your work, your art, your life',xp:5,energy:'any',time:'any'},
+    {id:'lc-r2',type:'rare',text:'Italian stops being a language you\'re learning and starts being a language you\'re living in, even briefly',xp:5,locked:true,lockHint:'Unlocks after Italian near horizon found',energy:'any',time:'any'},
+    {id:'lc-r3',type:'rare',text:'A thread develops far enough that you could teach it — you know this territory now',xp:5,locked:true,lockHint:'Unlocks at Threading',energy:'any',time:'any'},
+    {id:'lc-r4',type:'rare',text:'A connection between two threads that reframes both of them',xp:5,locked:true,lockHint:'Unlocks at Threading',energy:'any',time:'any'},
+    {id:'lc-t1',type:'trophy',icon:'🗺️',text:'A loose syllabus that exists and that you\'ve actually returned to',xp:10,ceremony:'It exists outside your head. You\'ve been back to it. That\'s a curriculum.'},
+    {id:'lc-t2',type:'trophy',icon:'🇮🇹',text:'Italian with a real near horizon — a trip planned, a scene imagined, a reason that creates urgency',xp:10,locked:true,lockHint:'Unlocks after Italian near horizon found',ceremony:'The language has somewhere to go. That\'s what makes it feel necessary.'},
+    {id:'lc-t3',type:'trophy',icon:'🕸️',text:'One thread followed far enough to feel genuinely deep — not dabbled, inhabited',xp:15,locked:true,lockHint:'Unlocks at Threading',ceremony:'You went past the surface. You\'ve been in this territory long enough to know it.'}
+  ]},
+
+  'practice-attention':{id:'practice-attention',regionId:'mind',name:'The Practice of Attention',icon:'🌿',tagline:'Morning pages · Stillness · Noticing · Rest',color:'#3a5a4a',bgColor:'#e8f0ec',textColor:'#2a4a3a',principle:'Attention is a practice, not a trait. You cultivate it the same way you cultivate anything — by showing up for it regularly.',levels:['Spinning','Settling','Present','Attentive'],levelDesc:['The hunger has nowhere good to go. Doomscrolling, flailing, dopamine seeking.','Morning pages are happening sometimes. The conditions are starting to be protected.','The practice holds. Stillness is a regular thing. The end of the day feels expected.','You move through the world as someone who pays attention. The noticing is a reflex.'],xp:0,maxXp:30,currentLevel:0,hasEmergency:true,rooms:[
+    {id:'pa-cr1',type:'common',text:'Morning pages — thinking on paper before the world makes demands',xp:1,energy:'low',time:'quick'},
+    {id:'pa-cr2',type:'common',text:'Cultivate stillness — sit at the crossroads before choosing a path',xp:1,energy:'low',time:'quick'},
+    {id:'pa-cr3',type:'common',text:'Notice and name — when something moves you, say why, even one sentence',xp:1,energy:'quick',time:'quick'},
+    {id:'pa-cr4',type:'common',text:'Protect the conditions for attention — enough sleep, enough space, enough silence',xp:1,energy:'low',time:'quick'},
+    {id:'pa-cr5',type:'common',text:'Seek across many channels — written, visual, audio, experiential',xp:1,energy:'low',time:'quick'},
+    {id:'pa-s1',type:'step',text:'Establish morning pages as a non-negotiable container — not creative writing, thinking out loud',xp:2,energy:'medium',time:'hour'},
+    {id:'pa-s2',type:'step',text:'Begin noticing what you notice — what keeps appearing in what moves you',xp:2,energy:'medium',time:'quick'},
+    {id:'pa-s3',type:'step',text:'Protect a regular window for seeking not connected to a specific project or goal',xp:2,energy:'medium',time:'hour'},
+    {id:'pa-s4',type:'step',text:'Create a wind down routine that supports rest',xp:2,energy:'low',time:'hour'},
+    {id:'pa-s5',type:'step',text:'Take an intentional midday break to empty and recharge',xp:2,energy:'low',time:'quick'},
+    {id:'pa-u1',type:'upgrade',text:'Morning pages stop feeling like a task and start feeling like a missing piece when skipped',xp:3,energy:'any',time:'any'},
+    {id:'pa-u2',type:'upgrade',text:'Deliberate seeking starts replacing passive scrolling in the moments between things',xp:3,locked:true,lockHint:'Unlocks at Settling',energy:'any',time:'any'},
+    {id:'pa-u3',type:'upgrade',text:'Your trusted channels start to feel like a curated world rather than a feed',xp:3,locked:true,lockHint:'Unlocks at Present',energy:'any',time:'any'},
+    {id:'pa-u4',type:'upgrade',text:'The end of your day feels expected, not rushed, not grasping',xp:3,locked:true,lockHint:'Unlocks at Present',energy:'any',time:'any'},
+    {id:'pa-r1',type:'rare',text:'A morning pages session produces something you didn\'t know you thought — it arrived on the page',xp:5,energy:'any',time:'any'},
+    {id:'pa-r2',type:'rare',text:'The moment you realize your taste is coherent — what you\'re drawn to has a shape',xp:5,locked:true,lockHint:'Unlocks at Present',energy:'any',time:'any'},
+    {id:'pa-r3',type:'rare',text:'Attention producing something in another region that wouldn\'t have happened without the noticing',xp:5,locked:true,lockHint:'Unlocks at Attentive',energy:'any',time:'any'},
+    {id:'pa-t1',type:'trophy',icon:'📓',text:'Morning pages established as a daily practice — it holds across seasons',xp:10,ceremony:'The practice is yours. It holds when things are hard, not just when things are easy. That\'s a practice.'},
+    {id:'pa-t2',type:'trophy',icon:'🕯️',text:'A regular practice of stillness — meditation or just a moment before a decision',xp:10,locked:true,lockHint:'Unlocks at Settling',ceremony:'You made a space between impulse and action. That space is practice.'},
+    {id:'pa-t3',type:'trophy',icon:'✨',text:'Something produced by attention you can trace directly back to the noticing',xp:10,locked:true,lockHint:'Unlocks at Present',ceremony:'The attention did something. You can see where it came from.'},
+    {id:'pa-t4',type:'trophy',icon:'🌙',text:'Winding down is a daily ritual — the end of the day has a shape',xp:10,locked:true,lockHint:'Unlocks at Attentive',ceremony:'The day closes with intention. That\'s a different thing from it just stopping.'}
+  ],
+  emergency:{
+    principle:'The hunger is real. The scrolling, the flailing, the grasping — these are not the enemy. They\'re signals. Something real is being sought.',
+    context:'This is what unravelling looks like: doomscrolling, flailing, dopamine seeking, falling into old unhelpful patterns. It\'s what happens when the conditions for attention collapse and the hunger has nowhere good to go.',
+    phases:[
+      {title:'First — honor the need',steps:['Before fixing anything, ask: what am I actually hungry for right now? Rest, stimulation, connection, comfort, novelty. The answer changes what the smallest next step is.','The scrolling is an attempt to fill something real. Don\'t shame it away — redirect it.']},
+      {title:'Find the gentlest way back',steps:['Can I sit still for two minutes before reaching for the phone?','Can I do morning pages even badly — even just one sentence?','Can I name what\'s going on? Writing it out is often enough to slow it.','Can I protect just one condition — sleep, a walk, a meal, some silence?']},
+      {title:'The way back is through the body first',steps:['When Mind is spinning, the fastest route home runs through Honoring the Body or Nourishment.','A walk. A meal. A stretch. Stillness before stimulus.']},
+    ],
+    note:'This is not a character flaw. It\'s what happens when the conditions for attention collapse. Name it as weather, not character. The map hasn\'t expired.'
+  }},
+
+  'home-sanctuary':{id:'home-sanctuary',regionId:'nourishment',name:'Home as Sanctuary',icon:'🏡',tagline:'Tending · Kitchen · Outdoor space · Upkeep',color:'#4a7a2a',bgColor:'#ecf4e0',textColor:'#3a6a1a',principle:'Maintain what\'s working. Evolve slowly and intentionally. The home is a practice, not a project.',levels:['Functional','Tended','Evolving','Sanctuary'],levelDesc:['The home works. It\'s stable. But it\'s not yet intentional.','The home is being tended — the plants, the upkeep, the small resets. It feels cared for.','The kitchen is working better. The outdoor space is becoming real. Changes are happening slowly and deliberately.','The home reflects who you are now. It supports every other practice. It communicates something true about you.'],xp:0,maxXp:24,currentLevel:0,rooms:[
+    {id:'hs-cr1',type:'common',text:'Regular upkeep — chores, not letting things get out of hand',xp:1,energy:'medium',time:'hour'},
+    {id:'hs-cr2',type:'common',text:'Tend the plants — a daily signal of the home\'s aliveness',xp:1,energy:'low',time:'quick'},
+    {id:'hs-cr3',type:'common',text:'Keep the spaces that support other practices clear and ready',xp:1,energy:'low',time:'quick'},
+    {id:'hs-cr4',type:'common',text:'Small resets — tidy surface, made bed, cleared kitchen — without a big effort',xp:1,energy:'low',time:'quick'},
+    {id:'hs-cr5',type:'common',text:'Notice what\'s working and protect it',xp:1,energy:'quick',time:'quick'},
+    {id:'hs-s1',type:'step',text:'Identify what would make the kitchen work better for cooking — what\'s in the way, what\'s missing',xp:2,energy:'medium',time:'hour'},
+    {id:'hs-s2',type:'step',text:'Make one kitchen change at a time — not a renovation, a series of small deliberate improvements',xp:2,energy:'medium',time:'hour'},
+    {id:'hs-s3',type:'step',text:'Identify what the outdoor space needs to become genuinely nourishing',xp:2,energy:'medium',time:'hour'},
+    {id:'hs-s4',type:'step',text:'Begin evolving the outdoor space slowly — one addition, one improvement at a time',xp:2,energy:'medium',time:'open'},
+    {id:'hs-s5',type:'step',text:'Find the upkeep rhythm that holds across busy weeks',xp:2,energy:'medium',time:'hour'},
+    {id:'hs-r1',type:'rare',text:'A kitchen change that makes cooking genuinely easier — you feel the difference immediately',xp:5,energy:'any',time:'any'},
+    {id:'hs-r2',type:'rare',text:'The outdoor space on a good evening — it does what you wanted it to do',xp:5,locked:true,lockHint:'Unlocks after outdoor space evolving',energy:'any',time:'any'},
+    {id:'hs-r3',type:'rare',text:'A moment of looking around and feeling the home is exactly right — not finished, but right',xp:5,locked:true,lockHint:'Unlocks at Evolving',energy:'any',time:'any'},
+    {id:'hs-t1',type:'trophy',icon:'🍳',text:'The kitchen reorganized and working better for cooking',xp:10,ceremony:'The space supports the practice now. That\'s what it\'s for.'},
+    {id:'hs-t2',type:'trophy',icon:'🌿',text:'The outdoor space established as a nourishing place to be',xp:10,locked:true,lockHint:'Unlocks after outdoor space evolving',ceremony:'Somewhere outside that\'s yours. The home extends.'},
+    {id:'hs-t3',type:'trophy',icon:'🏡',text:'The home reflecting who you are now, not who you were when you moved in',xp:15,locked:true,lockHint:'Unlocks at Sanctuary',ceremony:'The home has become a document of who you are. That took time and intention.'}
+  ]},
+
+  'feeding-yourself':{id:'feeding-yourself',regionId:'nourishment',name:'Feeding Yourself Well',icon:'🍲',tagline:'Post-COVID exploration · Ease alongside experiment · Odd ingredients',color:'#5a8a2a',bgColor:'#f0f4e0',textColor:'#4a7a1a',principle:'Permissions, not plans. Nourishment over performance. The ritual matters as much as the result.',levels:['Functional','Exploring','Nourished','Ritual'],levelDesc:['Eating regularly and healthily. The basics work. But there\'s no relationship with food beyond that.','Exploring new approaches. The odd ingredients are becoming curiosity rather than guilt.','A real repertoire. Italian cooking is a thread. Cooking sometimes feels like ritual.','Feeding yourself is a genuine pleasure. The ritual is established. The kitchen is a creative space.'],xp:0,maxXp:26,currentLevel:0,rooms:[
+    {id:'fy-cr1',type:'common',text:'Eat regularly and well — the baseline that\'s already working',xp:1,energy:'low',time:'quick'},
+    {id:'fy-cr2',type:'common',text:'Keep the kitchen stocked with things that make healthy easy',xp:1,energy:'medium',time:'hour'},
+    {id:'fy-cr3',type:'common',text:'Notice what sounds good rather than what you should make',xp:1,energy:'quick',time:'quick'},
+    {id:'fy-cr4',type:'common',text:'Use what you have — the odd ingredients are an invitation not a burden',xp:1,energy:'medium',time:'hour'},
+    {id:'fy-cr5',type:'common',text:'Make something from scratch when the energy is there — don\'t force it when it isn\'t',xp:1,energy:'medium',time:'hour'},
+    {id:'fy-s1',type:'step',text:'Take stock of what\'s in the kitchen — odd ingredients, staples, gaps',xp:2,energy:'medium',time:'hour'},
+    {id:'fy-s2',type:'step',text:'Find three or four healthy and easy meals that become reliable anchors',xp:2,energy:'medium',time:'open'},
+    {id:'fy-s3',type:'step',text:'Explore one post-COVID approach to food — texture, color, creativity, novelty as entry points',xp:2,energy:'medium',time:'open'},
+    {id:'fy-s4',type:'step',text:'Begin using up the odd ingredients intentionally — one experiment at a time',xp:2,energy:'medium',time:'hour'},
+    {id:'fy-s5',type:'step',text:'Find the cooking ritual that feels good when conditions are right',xp:2,energy:'medium',time:'hour'},
+    {id:'fy-s6',type:'step',text:'Explore Italian cooking as a Living Curriculum thread — ingredients, techniques, the culture of the food',xp:2,energy:'medium',time:'open'},
+    {id:'fy-r1',type:'rare',text:'A dish that genuinely excites you — you want to make it again',xp:5,energy:'any',time:'any'},
+    {id:'fy-r2',type:'rare',text:'A new entry point into food that bypasses the taste limitation and delivers real pleasure',xp:5,energy:'any',time:'any'},
+    {id:'fy-r3',type:'rare',text:'Cooking as meditation — a session where the making is the point',xp:5,locked:true,lockHint:'Unlocks at Exploring',energy:'any',time:'any'},
+    {id:'fy-r4',type:'rare',text:'A meal shared that becomes a memory — the food as the container for connection',xp:5,locked:true,lockHint:'Unlocks at Nourished',energy:'any',time:'any'},
+    {id:'fy-t1',type:'trophy',icon:'🥘',text:'A small repertoire of healthy easy meals that are reliably yours',xp:10,ceremony:'You know what to make. It\'s yours. The kitchen has anchors.'},
+    {id:'fy-t2',type:'trophy',icon:'🍝',text:'Italian cooking as a real thread — you\'ve cooked from it, not just thought about it',xp:10,locked:true,lockHint:'Unlocks after Italian cooking explored',ceremony:'The food made the language real. And the language made the food mean something.'},
+    {id:'fy-t3',type:'trophy',icon:'✨',text:'The ritual established — cooking when conditions are right feels genuinely good',xp:10,locked:true,lockHint:'Unlocks at Ritual',ceremony:'Cooking stopped being a task. It became something you do.'}
+  ]},
+
+  'sensory-life':{id:'sensory-life',regionId:'nourishment',name:'Sensory Life',icon:'💎',tagline:'Personal style · Self care · Experiment & curate',color:'#6a4a8a',bgColor:'#f0e8f8',textColor:'#5a3a7a',principle:'Create yourself like you create your art — through curation and experimentation until it feels like something reliable.',levels:['Managed','Intentional','Expressive','Signature'],levelDesc:['Getting dressed, getting ready. Functional rather than chosen.','Beginning to choose deliberately. Wardrobe audited. Jewelry starting to suit. Style reference forming.','Getting dressed feels like self expression. Makeup is experimentation. Sewing has been attempted.','Your style is a creative practice. It\'s yours, it\'s coherent, it surprises you sometimes too.'],xp:0,maxXp:28,currentLevel:0,rooms:[
+    {id:'sl2-cr1',type:'common',text:'Daily self care — showers, skin care, drinking enough water',xp:1,energy:'low',time:'quick'},
+    {id:'sl2-cr2',type:'common',text:'Dress intentionally — even on low effort days, choose rather than default',xp:1,energy:'quick',time:'quick'},
+    {id:'sl2-cr3',type:'common',text:'Notice what you\'re drawn to — in other people\'s style, in images, in what makes you pause',xp:1,energy:'quick',time:'quick'},
+    {id:'sl2-cr4',type:'common',text:'Pampering as legitimate nourishment — not a reward, a practice',xp:1,energy:'low',time:'hour'},
+    {id:'sl2-cr5',type:'common',text:'Tend your appearance the way you tend your home — small regular acts',xp:1,energy:'low',time:'quick'},
+    {id:'sl2-s1',type:'step',text:'Audit your wardrobe — what fits, what feels like you, what needs to go',xp:2,energy:'medium',time:'open'},
+    {id:'sl2-s2',type:'step',text:'Identify the jewelry that suits you and set aside what doesn\'t — less but right',xp:2,energy:'medium',time:'hour'},
+    {id:'sl2-s3',type:'step',text:'Find the hair approach that feels intentional rather than managed',xp:2,energy:'medium',time:'hour'},
+    {id:'sl2-s4',type:'step',text:'Begin experimenting with makeup — treat it like drawing, low stakes exploration',xp:2,energy:'medium',time:'hour'},
+    {id:'sl2-s5',type:'step',text:'Learn one sewing or alteration skill that expands what you can do with clothes',xp:2,energy:'high',time:'open'},
+    {id:'sl2-s6',type:'step',text:'Build a style reference — what you\'re drawn to, what keeps appearing, what feels like you',xp:2,energy:'medium',time:'hour'},
+    {id:'sl2-s7',type:'step',text:'Find the skin care routine that feels like genuine care rather than maintenance',xp:2,energy:'medium',time:'hour'},
+    {id:'sl2-r1',type:'rare',text:'An outfit that feels completely right — you know it immediately',xp:5,energy:'any',time:'any'},
+    {id:'sl2-r2',type:'rare',text:'A makeup experiment that surprises you — you didn\'t know you could look like that',xp:5,locked:true,lockHint:'Unlocks at Intentional',energy:'any',time:'any'},
+    {id:'sl2-r3',type:'rare',text:'Something you altered or made that you wear regularly',xp:5,locked:true,lockHint:'Unlocks after sewing skill learned',energy:'any',time:'any'},
+    {id:'sl2-r4',type:'rare',text:'The moment your style feels like a creative practice — you\'re playing',xp:5,locked:true,lockHint:'Unlocks at Expressive',energy:'any',time:'any'},
+    {id:'sl2-t1',type:'trophy',icon:'👗',text:'A wardrobe that\'s been audited — what\'s there is there because it belongs',xp:10,ceremony:'The wardrobe is intentional now. Everything in it was chosen.'},
+    {id:'sl2-t2',type:'trophy',icon:'💍',text:'Jewelry sorted and suited — your collection reflects your actual aesthetic',xp:10,locked:true,lockHint:'Unlocks after jewelry sorted',ceremony:'Less, but right. The collection is yours now.'},
+    {id:'sl2-t3',type:'trophy',icon:'✂️',text:'A sewing or alteration skill learned and used',xp:10,locked:true,lockHint:'Unlocks after sewing skill learned',ceremony:'Your hands can change what you wear. That\'s a different relationship with clothes.'},
+    {id:'sl2-t4',type:'trophy',icon:'✨',text:'A style that feels genuinely yours — coherent, reflects who you are now',xp:15,locked:true,lockHint:'Unlocks at Signature',ceremony:'You could describe it. It has a shape. It\'s not borrowed — it\'s yours.'}
+  ]},
+
+  'your-people':{id:'your-people',regionId:'connection',name:'Your People',icon:'💛',tagline:'Receptive · Present · Sustainable',color:'#8a4a2a',bgColor:'#f8ede4',textColor:'#7a3a1a',principle:'Receptive is enough. Full presence when they need it, honest awareness when your reserves are low. Both are acts of love.',levels:['Running on Empty','Present','Sustainable','Mutual'],levelDesc:['Showing up is happening but the cost is high. The reserves aren\'t being protected.','You\'re receptive. Full attention is available when they come. The honest ask is starting.','The rhythm with your son during recovery is sustainable. A future thing is planned. The honest ask is established.','Connection with your kids is genuinely mutual. They give as much as they receive. The future is something you\'re building together.'],xp:0,maxXp:24,currentLevel:0,rooms:[
+    {id:'yp-cr1',type:'common',text:'Be receptive — not too busy, not too tired, not too overwhelmed to give full attention when it\'s asked for',xp:1,energy:'low',time:'quick'},
+    {id:'yp-cr2',type:'common',text:'Check in regularly — a text, a question, a moment of genuine interest in their lives',xp:1,energy:'quick',time:'quick'},
+    {id:'yp-cr3',type:'common',text:'Plan something to look forward to together — a weekend, a holiday, a shared future moment',xp:1,energy:'medium',time:'hour'},
+    {id:'yp-cr4',type:'common',text:'Notice your reserves — know when you have plenty and when you need to protect what\'s left',xp:1,energy:'quick',time:'quick'},
+    {id:'yp-cr5',type:'common',text:'Ask for space when you need it — this is what makes the full presence possible the rest of the time',xp:1,energy:'quick',time:'quick'},
+    {id:'yp-s1',type:'step',text:'Find new ways into connection with each kid that don\'t leave you drained',xp:2,energy:'medium',time:'hour'},
+    {id:'yp-s2',type:'step',text:'Establish an evolving rhythm with your son during his recovery — what does he need, what can you sustainably give',xp:2,energy:'medium',time:'hour'},
+    {id:'yp-s3',type:'step',text:'Build at least one future thing to look forward to with your kids',xp:2,energy:'medium',time:'hour'},
+    {id:'yp-s4',type:'step',text:'Practice the honest ask — naming when your reserves are low before you\'re empty',xp:2,energy:'medium',time:'quick'},
+    {id:'yp-s5',type:'step',text:'Find the version of family connection that loops into your future, not just the present moment',xp:2,energy:'medium',time:'hour'},
+    {id:'yp-r1',type:'rare',text:'A moment with your son during recovery that becomes something — a conversation that wouldn\'t have happened otherwise',xp:5,energy:'any',time:'any'},
+    {id:'yp-r2',type:'rare',text:'A day with your kids where connection feels completely easy — nobody is performing, everybody is just there',xp:5,energy:'any',time:'any'},
+    {id:'yp-r3',type:'rare',text:'Planning a future together and realizing you\'re all genuinely looking forward to it',xp:5,locked:true,lockHint:'Unlocks after future thing planned',energy:'any',time:'any'},
+    {id:'yp-t1',type:'trophy',icon:'💛',text:'A recovery rhythm with your son that\'s sustainable',xp:10,ceremony:'You\'re showing up without running dry. That\'s the whole thing right now.'},
+    {id:'yp-t2',type:'trophy',icon:'🗓️',text:'A future thing planned and looked forward to',xp:10,locked:true,lockHint:'Unlocks after future thing planned',ceremony:'There\'s something on the horizon that belongs to all of you.'},
+    {id:'yp-t3',type:'trophy',icon:'🤝',text:'The honest ask established — you can name your limits without guilt',xp:10,locked:true,lockHint:'Unlocks at Sustainable',ceremony:'You asked for what you needed. That\'s not failure. That\'s how this stays possible.'}
+  ]},
+
+  'gentle-reach':{id:'gentle-reach',regionId:'connection',name:'Gentle Reach',icon:'🌿',tagline:'A text counts · Answering counts · Low stakes, warm',color:'#7a3a1a',bgColor:'#f8ece0',textColor:'#6a2a0a',principle:'Presence doesn\'t require proximity. A small genuine gesture beats a large obligatory one every time.',levels:['Withdrawn','Warming','Reaching','Warm'],levelDesc:['Connection beyond your immediate people isn\'t happening. That\'s okay. That\'s where you are.','Answering is happening. One or two friendships are being kept warm. The floor is holding.','You\'re reaching out unprompted sometimes. A friendship has been maintained across the hard season.','The friendships worth tending are tended. The threads are there when life opens up.'],xp:0,maxXp:20,currentLevel:0,rooms:[
+    {id:'gr-cr1',type:'common',text:'Answer texts when they come — this is the floor, and the floor is enough',xp:1,energy:'low',time:'quick'},
+    {id:'gr-cr2',type:'common',text:'Send one unprompted message when someone crosses your mind',xp:1,energy:'quick',time:'quick'},
+    {id:'gr-cr3',type:'common',text:'Stay curious about the people you care about — remember what they\'re going through, ask about it later',xp:1,energy:'quick',time:'quick'},
+    {id:'gr-cr4',type:'common',text:'Accept that gentle is enough right now',xp:1,energy:'low',time:'quick'},
+    {id:'gr-s1',type:'step',text:'Identify the friendships worth tending right now',xp:2,energy:'medium',time:'hour'},
+    {id:'gr-s2',type:'step',text:'Find the lowest friction version of reaching out that still feels genuine',xp:2,energy:'medium',time:'quick'},
+    {id:'gr-s3',type:'step',text:'Respond to one message you\'ve been avoiding',xp:2,energy:'medium',time:'quick'},
+    {id:'gr-s4',type:'step',text:'Send one unprompted reach out this week',xp:2,energy:'medium',time:'quick'},
+    {id:'gr-s5',type:'step',text:'Let people know where you are if it feels right — you don\'t have to perform okayness',xp:2,energy:'medium',time:'quick'},
+    {id:'gr-r1',type:'rare',text:'A text exchange that turns into something real — genuine connection that neither of you planned',xp:5,energy:'any',time:'any'},
+    {id:'gr-r2',type:'rare',text:'A friend who shows up for you in exactly the right way without being asked',xp:5,energy:'any',time:'any'},
+    {id:'gr-r3',type:'rare',text:'Realizing a friendship has deepened quietly — the gentle reach accumulated into something',xp:5,locked:true,lockHint:'Unlocks at Reaching',energy:'any',time:'any'},
+    {id:'gr-t1',type:'trophy',icon:'📱',text:'The friendships worth tending identified',xp:8,ceremony:'You know who they are. The list is shorter than it looks and that\'s exactly right.'},
+    {id:'gr-t2',type:'trophy',icon:'🌿',text:'A friendship maintained across this hard season — still warm, still real',xp:12,locked:true,lockHint:'Unlocks at Reaching',ceremony:'The thread held. When life opens up, it\'s still there.'}
+  ]},
+
+  'becoming':{id:'becoming',regionId:'connection',name:'Becoming',icon:'🌱',tagline:'The longer horizon · Every region feeds this one',color:'#6a2a1a',bgColor:'#f8e8e0',textColor:'#5a1a0a',principle:'Use this time to become someone you\'d love to connect with. The rest follows.',levels:['Waiting','Building','Becoming','Arrived'],levelDesc:['Connection feels impossible. Energy is spoken for. The longer horizon isn\'t visible yet.','The work in every other region is becoming work. You\'re beginning to see it.','You\'re catching yourself being the person you wanted to become. The longer horizon is real.','The season turned. You came through it more yourself, not less.'],xp:0,maxXp:22,currentLevel:0,rooms:[
+    {id:'bc-cr1',type:'common',text:'Remember that every region feeds this one — Body, Mind, Creative Life, Nourishment are all becoming work',xp:1,energy:'low',time:'quick'},
+    {id:'bc-cr2',type:'common',text:'Notice who you\'re growing into — not just what you\'re doing but who it\'s making you',xp:1,energy:'quick',time:'quick'},
+    {id:'bc-cr3',type:'common',text:'Stay open to connection when it appears unexpectedly — it doesn\'t always announce itself',xp:1,energy:'low',time:'quick'},
+    {id:'bc-cr4',type:'common',text:'Hold the longer horizon lightly — not as pressure, as orientation',xp:1,energy:'low',time:'quick'},
+    {id:'bc-s1',type:'step',text:'Name the person you\'re becoming — not a goal, a direction. What qualities are you cultivating?',xp:2,energy:'medium',time:'hour'},
+    {id:'bc-s2',type:'step',text:'Identify one thing you\'re doing in another region that is directly building who you want to be in connection',xp:2,energy:'medium',time:'quick'},
+    {id:'bc-s3',type:'step',text:'Stay open to one new connection this season — low stakes, no agenda, just curiosity',xp:2,energy:'low',time:'quick'},
+    {id:'bc-s4',type:'step',text:'When connection feels impossible, return to this path — remind yourself what the work is for',xp:2,energy:'low',time:'quick'},
+    {id:'bc-r1',type:'rare',text:'You catch yourself being the person you wanted to become — in a conversation, in a moment, you know it in real time',xp:5,energy:'any',time:'any'},
+    {id:'bc-r2',type:'rare',text:'Someone sees who you\'re becoming and reflects it back to you',xp:5,locked:true,lockHint:'Unlocks at Becoming',energy:'any',time:'any'},
+    {id:'bc-r3',type:'rare',text:'A connection that finds you — you didn\'t go looking, it arrived because of who you are',xp:5,locked:true,lockHint:'Unlocks at Becoming',energy:'any',time:'any'},
+    {id:'bc-r4',type:'rare',text:'The season turns — life opens up and you\'re ready, more ready than you would have been without this time',xp:5,locked:true,lockHint:'Unlocks at Arrived',energy:'any',time:'any'},
+    {id:'bc-t1',type:'trophy',icon:'🪞',text:'A clear sense of who you\'re becoming — you could describe her, she has a shape',xp:10,ceremony:'She\'s not hypothetical. You can see her. That\'s a different kind of knowing.'},
+    {id:'bc-t2',type:'trophy',icon:'🎁',text:'Something built in another region that shows up as a gift in connection',xp:10,locked:true,lockHint:'Unlocks at Becoming',ceremony:'The work crossed over. A skill, a quality, a way of being — and someone felt it.'},
+    {id:'bc-t3',type:'trophy',icon:'🌸',text:'The hard season recognized as the work it was — you came through it more yourself, not less',xp:15,locked:true,lockHint:'Unlocks at Arrived',ceremony:'You didn\'t wait it out. You worked through it. And here you are.'}
+  ]}
+};
+
+// energy: 'low' | 'medium' | 'high'   time: 'quick' | 'hour' | 'open'
+const OPEN_DOORS=[
+  {ico:'🌅',main:'A morning stretch before anything asks for you',path:'Honoring the Body',region:'body',pid:'honoring-body',rid:'hb-cr1',energy:'low',time:'quick',badge:'b-q',label:'Quick Win'},
+  {ico:'🌊',main:'Notice what you\'re carrying in your body right now',path:'Honoring the Body',region:'body',pid:'honoring-body',rid:'hb-cr5',energy:'low',time:'quick',badge:'b-d',label:'Side Door'},
+  {ico:'💃',main:'Put on music and let your body respond — one song',path:'Joy & Expression',region:'body',pid:'joy-expression',rid:'je-cr1',energy:'low',time:'quick',badge:'b-q',label:'Quick Win'},
+  {ico:'📖',main:'Morning reading window — something thought provoking',path:'The Reading Life',region:'mind',pid:'reading-life',rid:'rl-cr1',energy:'low',time:'quick',badge:'b-q',label:'Quick Win'},
+  {ico:'📚',main:'Evening reading window — something beautiful',path:'The Reading Life',region:'mind',pid:'reading-life',rid:'rl-cr2',energy:'low',time:'quick',badge:'b-q',label:'Quick Win'},
+  {ico:'📓',main:'Morning pages — thinking on paper before the world makes demands',path:'Practice of Attention',region:'mind',pid:'practice-attention',rid:'pa-cr1',energy:'low',time:'quick',badge:'b-q',label:'Quick Win'},
+  {ico:'🕸️',main:'Follow the associative pull — one thing leading to another is the method',path:'The Living Curriculum',region:'mind',pid:'living-curriculum',rid:'lc-cr1',energy:'low',time:'quick',badge:'b-q',label:'Quick Win'},
+  {ico:'🎨',main:'Follow the thread when something hits',path:'The Seeking Life',region:'creative',pid:'seeking-life',rid:'sl-cr1',energy:'low',time:'quick',badge:'b-q',label:'Quick Win'},
+  {ico:'🪴',main:'Prepare tomorrow\'s drawing focus tonight',path:'The Personal Practice',region:'creative',pid:'personal-practice',rid:'pp-cr2',energy:'low',time:'quick',badge:'b-q',label:'Quick Win'},
+  {ico:'🗂️',main:'Save something beautiful you find today',path:'Inspiration Garden',region:'creative',pid:'inspiration-garden',rid:'ig-cr1',energy:'low',time:'quick',badge:'b-q',label:'Quick Win'},
+  {ico:'🏡',main:'Tend the plants — a daily signal of the home\'s aliveness',path:'Home as Sanctuary',region:'nourishment',pid:'home-sanctuary',rid:'hs-cr2',energy:'low',time:'quick',badge:'b-q',label:'Quick Win'},
+  {ico:'💎',main:'Dress intentionally today — choose rather than default',path:'Sensory Life',region:'nourishment',pid:'sensory-life',rid:'sl2-cr2',energy:'low',time:'quick',badge:'b-q',label:'Quick Win'},
+  {ico:'💛',main:'Check in — a text, a question, a moment of genuine interest',path:'Your People',region:'connection',pid:'your-people',rid:'yp-cr2',energy:'low',time:'quick',badge:'b-q',label:'Quick Win'},
+  {ico:'🌿',main:'Answer a text you\'ve been meaning to answer',path:'Gentle Reach',region:'connection',pid:'gentle-reach',rid:'gr-cr1',energy:'low',time:'quick',badge:'b-q',label:'Quick Win'},
+  {ico:'💬',main:'Talk with your son about an adventure idea',path:'Adventure & Capability',region:'body',pid:'adventure-capability',rid:'ac-cr2',energy:'low',time:'quick',badge:'b-q',label:'Quick Win'},
+  {ico:'🥾',main:'Look up one hiking trail for you and your son',path:'Adventure & Capability',region:'body',pid:'adventure-capability',rid:'ac-s1',energy:'medium',time:'hour',badge:'b-s',label:'Next Step'},
+  {ico:'🎨',main:'An evening drawing session — decide the focus first',path:'The Personal Practice',region:'creative',pid:'personal-practice',rid:'pp-cr3',energy:'medium',time:'hour',badge:'b-s',label:'Next Step'},
+  {ico:'🍲',main:'Use up one odd ingredient — make something from it',path:'Feeding Yourself Well',region:'nourishment',pid:'feeding-yourself',rid:'fy-cr4',energy:'medium',time:'hour',badge:'b-s',label:'Next Step'},
+  {ico:'💃',main:'Attend the African dance class you\'ve identified',path:'Joy & Expression',region:'body',pid:'joy-expression',rid:'je-s1',energy:'high',time:'open',badge:'b-s',label:'Next Step'},
+  {ico:'🏗️',main:'One strength session this week',path:'The Foundation',region:'body',pid:'the-foundation',rid:'tf-cr1',energy:'high',time:'hour',badge:'b-s',label:'Next Step'},
+  {ico:'🔭',main:'Study an artist properly — not just admiringly',path:'The Seeking Life',region:'creative',pid:'seeking-life',rid:'sl-s1',energy:'high',time:'open',badge:'b-s',label:'Deep Work'}
+];
+
+const QUESTS=[
+  {txt:'Study an artist whose work you hold tightly — not just look, actually analyze what they\'re doing',tag:'🔭 The Seeking Life',pid:'seeking-life',rid:'sl-s1',region:'creative'},
+  {txt:'A drawing session where you decide the focus before you sit down',tag:'🪴 The Personal Practice',pid:'personal-practice',rid:'pp-cr2',region:'creative'},
+  {txt:'Photograph something beautiful you encounter today',tag:'🗂️ Inspiration Garden',pid:'inspiration-garden',rid:'ig-cr2',region:'creative'},
+  {txt:'Read something about making — even just a few pages',tag:'📚 Aesthetic Education',pid:'aesthetic-education',rid:'ae-cr1',region:'creative'},
+  {txt:'Do something that requires your body to be capable',tag:'🥾 Adventure & Capability',pid:'adventure-capability',rid:'ac-cr1',region:'body'},
+  {txt:'A morning stretch before anything else asks for your attention',tag:'🌊 Honoring the Body',pid:'honoring-body',rid:'hb-cr1',region:'body'},
+  {txt:'Put on music and let your body respond — even one song',tag:'💃 Joy & Expression',pid:'joy-expression',rid:'je-cr1',region:'body'},
+  {txt:'Morning pages — thinking on paper before the world makes demands',tag:'📓 Practice of Attention',pid:'practice-attention',rid:'pa-cr1',region:'mind'},
+  {txt:'Follow the associative pull — what thread is alive right now?',tag:'🕸️ The Living Curriculum',pid:'living-curriculum',rid:'lc-cr1',region:'mind'},
+  {txt:'Evening reading window — something emotional or beautiful',tag:'📖 The Reading Life',pid:'reading-life',rid:'rl-cr2',region:'mind'},
+  {txt:'Tend the plants — small daily noticing',tag:'🏡 Home as Sanctuary',pid:'home-sanctuary',rid:'hs-cr2',region:'nourishment'},
+  {txt:'Use up one odd ingredient — make something from what you have',tag:'🍲 Feeding Yourself Well',pid:'feeding-yourself',rid:'fy-cr4',region:'nourishment'},
+  {txt:'Check in with one of your kids — a text, a question, genuine interest',tag:'💛 Your People',pid:'your-people',rid:'yp-cr2',region:'connection'},
+  {txt:'Send one unprompted message to someone who crossed your mind',tag:'🌿 Gentle Reach',pid:'gentle-reach',rid:'gr-cr2',region:'connection'}
+];
+
+// ── STATE ─────────────────────────────
+const STATE_KEY='lifemap_v2';
+let state={discovered:{},trophies:{},log:[],pathXP:{},pathLevel:{}};
+
+function loadState(){
+  try{const s=localStorage.getItem(STATE_KEY);if(s)state=JSON.parse(s);}catch(e){}
+  Object.values(PATHS).forEach(p=>{
+    if(state.pathXP[p.id]===undefined)state.pathXP[p.id]=0;
+    if(state.pathLevel[p.id]===undefined)state.pathLevel[p.id]=0;
+  });
+}
+function saveState(){try{localStorage.setItem(STATE_KEY,JSON.stringify(state));}catch(e){}}
+
+// ── NAV ───────────────────────────────
+const NAV_MAP={'home':'nb-home','map-screen':'nb-map','quest-screen':'nb-quest','log-screen':'nb-log'};
+let currentScreen='home';
+let currentRegionId=null;
+
+function goScreen(id,regionId,pathId,roomId){
+  const prev=document.getElementById(currentScreen);
+  const next=document.getElementById(id);
+  if(!next)return;
+  if(id!==currentScreen){
+    prev.classList.add(id==='home'?'off-right':'off-left');
+    next.classList.remove('off-left','off-right');
+    next.scrollTop=0;
+    currentScreen=id;
+    document.querySelectorAll('.nb').forEach(b=>b.classList.remove('on'));
+    if(NAV_MAP[id])document.getElementById(NAV_MAP[id]).classList.add('on');
+  }
+  if(regionId&&id==='region-screen'){
+    currentRegionId=regionId;
+    renderRegion(regionId);
+  }
+  // Deep link to specific path+room
+  if(pathId){
+    requestAnimationFrame(()=>{
+      const card=document.getElementById('pc-'+pathId);
+      if(card){
+        card.classList.add('open');
+        card.scrollIntoView({behavior:'smooth',block:'start'});
+        if(roomId){
+          setTimeout(()=>{
+            const row=document.getElementById('rr-'+roomId);
+            if(row)row.scrollIntoView({behavior:'smooth',block:'center'});
+          },350);
+        }
+      }
+    });
+  }
+}
+
+function questDeepLink(){
+  const today=new Date();
+  const qi=today.getDate()%QUESTS.length;
+  const q=QUESTS[qi];
+  goScreen('region-screen',q.region,q.pid,q.rid);
+}
+
+// ── PLANTS ────────────────────────────
+function sproutSVG(regionId){
+  // Everyone starts as a tiny sprout — 1 leaf, short stem
+  const colors={creative:'#5a9a6a',body:'#6a9a5a',mind:'#7a9a6a',nourishment:'#8aaa6a',connection:'#9aaa7a'};
+  const c=colors[regionId]||'#7a9a6a';
+  return `<svg width="24" height="36" viewBox="0 0 24 36">
+    <rect x="10" y="18" width="4" height="18" rx="2" fill="${c}" opacity="0.8"/>
+    <ellipse cx="12" cy="14" rx="8" ry="10" fill="${c}" opacity="0.7"/>
+    <ellipse cx="6" cy="18" rx="5" ry="7" fill="${c}" opacity="0.55" transform="rotate(-20,6,18)"/>
+  </svg>`;
+}
+
+function plantSVG(regionId){
+  const xpTotal=Object.values(PATHS).filter(p=>p.regionId===regionId).reduce((s,p)=>s+(state.pathXP[p.id]||0),0);
+  const level=xpTotal<5?0:xpTotal<20?1:xpTotal<50?2:3;
+  if(level===0) return sproutSVG(regionId);
+  const W={1:52,2:72,3:88}[level];
+  const H={1:68,2:90,3:108}[level];
+  const fc=regionId==='creative'?'#4a8a5a':'#5a8a6a';
+  const flowers={creative:[
+    {cx:W/2,cy:H*.12,r:W*.09,c:'#f5c4d8',cc:'#e8849a'},
+    level>=2&&{cx:W*.28,cy:H*.22,r:W*.07,c:'#f5e4a8',cc:'#e8c468'},
+    level>=2&&{cx:W*.72,cy:H*.24,r:W*.07,c:'#d4f4d4',cc:'#64c464'},
+    level>=3&&{cx:W*.38,cy:H*.1,r:W*.06,c:'#d4e8f8',cc:'#84b8e8'},
+    level>=3&&{cx:W*.62,cy:H*.11,r:W*.06,c:'#f4d4f8',cc:'#c484d8'}
+  ].filter(Boolean),body:[
+    {cx:W/2,cy:H*.14,r:W*.09,c:'#f5d78a',cc:'#e8a84a'},
+    level>=2&&{cx:W*.28,cy:H*.25,r:W*.07,c:'#c8e8f8',cc:'#68b8e8'},
+    level>=3&&{cx:W*.72,cy:H*.22,r:W*.07,c:'#d4f4f4',cc:'#64c4c4'}
+  ].filter(Boolean)};
+  const f=(flowers[regionId]||flowers.body);
+  const flSVG=f.map(fl=>`<circle cx="${fl.cx}" cy="${fl.cy}" r="${fl.r}" fill="${fl.c}"/><circle cx="${fl.cx}" cy="${fl.cy}" r="${fl.r*.6}" fill="${fl.cc}"/>`).join('');
+  return `<svg width="${W}" height="${H}" viewBox="0 0 ${W} ${H}">
+    <rect x="${W/2-3}" y="${H*.46}" width="6" height="${H*.52}" rx="3" fill="#6a9a5a"/>
+    <ellipse cx="${W/2}" cy="${H*.38}" rx="${W*.36+level*2}" ry="${H*.33+level*3}" fill="${fc}" opacity="0.88"/>
+    <ellipse cx="${W*.3}" cy="${H*.3}" rx="${W*.2+level*2}" ry="${H*.23+level*2}" fill="#5a9a6a" opacity="0.8"/>
+    <ellipse cx="${W*.7}" cy="${H*.32}" rx="${W*.18+level*2}" ry="${H*.21+level*2}" fill="#3a7a4a" opacity="0.8"/>
+    ${level>=2?`<ellipse cx="${W/2}" cy="${H*.22}" rx="${W*.17+level*2}" ry="${H*.17+level*2}" fill="#6aaa7a" opacity="0.75"/>`:''}
+    ${flSVG}
+  </svg>`;
+}
+
+function renderGarden(){
+  const order=['body','creative','mind','nourishment','connection'];
+  const labels={body:'Body',creative:'Creative',mind:'Mind',nourishment:'Nourish',connection:'Connect'};
+  document.getElementById('garden-row').innerHTML=order.map(id=>`
+    <button class="plant-btn" onclick="goScreen('region-screen','${id}')">
+      ${plantSVG(id)}
+      <div class="plant-lbl">${labels[id]}</div>
+    </button>`).join('');
+}
+
+// ── REGION ────────────────────────────
+function renderRegion(regionId){
+  const R=REGIONS[regionId];
+  document.getElementById('region-hero').style.background=R.color;
+  document.getElementById('hero-title').innerHTML=R.name.replace(' ','<br>');
+  document.getElementById('hero-principle').textContent=R.principle;
+  document.getElementById('hero-deco').innerHTML=`<svg width="120" height="160" viewBox="0 0 120 160" opacity="0.4">
+    <rect x="56" y="90" width="8" height="70" rx="4" fill="#6aaa6a"/>
+    <ellipse cx="60" cy="72" rx="34" ry="44" fill="#4a8a5a"/>
+    <ellipse cx="40" cy="54" rx="20" ry="28" fill="#5a9a6a"/>
+    <ellipse cx="80" cy="57" rx="18" ry="26" fill="#3a7a4a"/>
+    <circle cx="60" cy="20" r="9" fill="#f5c4d8"/><circle cx="60" cy="20" r="5" fill="#e8849a"/>
+    <circle cx="40" cy="30" r="6" fill="#f5e4a8"/><circle cx="40" cy="30" r="3.5" fill="#e8c468"/>
+    <circle cx="80" cy="32" r="6" fill="#d4f4d4"/><circle cx="80" cy="32" r="3.5" fill="#64c464"/>
+  </svg>`;
+  document.getElementById('path-cards-container').innerHTML=R.paths.map(pid=>renderPathCard(pid)).join('');
+}
+
+function renderPathCard(pid){
+  const P=PATHS[pid];if(!P)return'';
+  const xp=state.pathXP[pid]||0;
+  const level=state.pathLevel[pid]||0;
+  const lvlName=P.levels[level];
+  const pct=Math.min(100,Math.round(xp/P.maxXp*100));
+  const discovered=P.rooms.filter(r=>state.discovered[r.id]).length;
+  const lvlUpReady=xp>=P.maxXp&&level<P.levels.length-1;
+  return `<div class="path-card" id="pc-${pid}" onclick="togglePath('${pid}')">
+    <div class="path-top" style="background:linear-gradient(90deg,${P.color},${P.color}aa)"></div>
+    <div class="path-head">
+      <div class="path-ico" style="background:${P.bgColor}">${P.icon}</div>
+      <div class="path-info"><div class="path-name">${P.name}</div><div class="path-tagline">${P.tagline}</div></div>
+      <span class="path-pill" style="background:${P.bgColor};color:${P.textColor}">${lvlName}</span>
+    </div>
+    <div class="path-xp-row"><div class="path-xp-track"><div class="path-xp-fill" id="xpfill-${pid}" style="width:${pct}%;background:linear-gradient(90deg,${P.color}cc,${P.color})"></div></div></div>
+    <div class="path-xp-meta">
+      <span class="path-xp-disc" id="disc-${pid}">${discovered} of ${P.rooms.length} discovered</span>
+      <span class="path-xp-next" id="xplabel-${pid}" style="color:${P.textColor}">${xp}/${P.maxXp} xp → ${P.levels[Math.min(level+1,P.levels.length-1)]}</span>
+    </div>
+    <div class="path-rooms" id="pr-${pid}">
+      ${renderRooms(P)}
+      ${lvlUpReady?`<div class="lv-banner" onclick="event.stopPropagation();openLevelUp('${pid}')">
+        <span class="lv-banner-ico">🌸</span>
+        <div class="lv-banner-text">
+          <div class="lv-banner-eye">Ready to level up</div>
+          <div class="lv-banner-title">${P.name}</div>
+          <div class="lv-banner-sub">${lvlName} → ${P.levels[level+1]} · tap to claim</div>
+        </div><span style="font-size:16px;color:#5a9a6a">→</span>
+      </div>`:''}
+      ${P.hasEmergency?renderEmergency(P):''}
+    </div>
+  </div>`;
+}
+
+function renderRooms(P){
+  const by={common:[],step:[],rare:[],trophy:[]};
+  P.rooms.forEach(r=>{if(by[r.type])by[r.type].push(r);});
+  let h='';
+  if(by.common.length){h+=`<div class="room-sec">🚪 Common Rooms</div>`;h+=by.common.map(r=>roomRow(r,P.id)).join('');}
+  if(by.step.length){h+=`<div class="room-sec">→ Steps</div>`;h+=by.step.map(r=>roomRow(r,P.id)).join('');}
+  if(by.rare.length){h+=`<div class="room-sec">⭐ Rare Rooms</div>`;h+=by.rare.map(r=>roomRow(r,P.id)).join('');}
+  if(by.trophy.length){h+=`<div class="room-sec">🏆 Trophies</div>`;h+=by.trophy.map(r=>roomRow(r,P.id)).join('');}
+  return h;
+}
+
+function roomRow(r,pid){
+  const done=!!state.discovered[r.id];
+  const claimed=!!state.trophies[r.id];
+  const locked=r.locked&&!done;
+  const isTrophy=r.type==='trophy';
+  let cls='room-row';
+  if(done)cls+=' done';
+  if(locked)cls+=' locked';
+  if(isTrophy)cls+=' trophy-row';
+  let dot=locked?'🔒':(isTrophy&&claimed?'★':(done?'✓':''));
+  let sub='';
+  if(locked) sub=`<div class="r-sub">${r.lockHint||'Locked'}</div>`;
+  else if(isTrophy) sub=`<div class="r-sub trophy-lnk" onclick="event.stopPropagation();openTrophy('${r.id}','${pid}')">${claimed?'Revisit trophy':'Tap to claim'} · +${r.xp} xp</div>`;
+  else if(!done) sub=`<div class="r-sub ${r.type==='rare'?'rare':''}">${r.type==='rare'?'Rare · ':''}+${r.xp} xp</div>`;
+  else sub=`<div class="r-sub" style="display:flex;align-items:center;gap:6px;"><span style="color:#9aaa9a">+${r.xp} xp</span><span style="color:#9aaa9a;font-size:10px">· tap to undo</span></div>`;
+  const clickAttr=locked?'':(isTrophy
+    ?`onclick="event.stopPropagation();openTrophy('${r.id}','${pid}')"`
+    :(done
+      ?`onclick="event.stopPropagation();undoRoom('${r.id}','${pid}',${r.xp},this)"`
+      :`onclick="event.stopPropagation();discoverRoom('${r.id}','${pid}',${r.xp},this)"`));
+  return `<div class="${cls}" ${clickAttr} id="rr-${r.id}">
+    <div class="r-dot" id="rd-${r.id}">${dot}</div>
+    <div class="r-body"><div class="r-text">${locked?'???':r.text}</div>${sub}</div>
+  </div>`;
+}
+
+function renderEmergency(P){
+  const e=P.emergency;
+  return `<div class="emergency-box">
+    <div class="em-header"><span class="em-icon">⚡</span><div class="em-title">Emergency Architecture</div></div>
+    <div class="em-principle">${e.principle}</div>
+    <div class="em-context">${e.context}</div>
+    ${e.phases.map(ph=>`
+      <div class="em-phase">
+        <div class="em-phase-title">${ph.title}</div>
+        ${ph.steps.map((s,i)=>`<div class="em-step"><div class="em-step-num">${i+1}</div><div>${s}</div></div>`).join('')}
+      </div>`).join('')}
+    <div class="em-note">${e.note}</div>
+  </div>`;
+}
+
+function togglePath(pid){
+  document.getElementById('pc-'+pid)?.classList.toggle('open');
+}
+
+// Live XP update helpers
+function updatePathHeader(pid){
+  const xp=state.pathXP[pid]||0;
+  const level=state.pathLevel[pid]||0;
+  const P=PATHS[pid];
+  const pct=Math.min(100,Math.round(xp/P.maxXp*100));
+  const discovered=P.rooms.filter(r=>state.discovered[r.id]).length;
+  const fill=document.getElementById('xpfill-'+pid);
+  const disc=document.getElementById('disc-'+pid);
+  const lbl=document.getElementById('xplabel-'+pid);
+  if(fill) fill.style.width=pct+'%';
+  if(disc) disc.textContent=`${discovered} of ${P.rooms.length} discovered`;
+  if(lbl)  lbl.textContent=`${xp}/${P.maxXp} xp → ${P.levels[Math.min(level+1,P.levels.length-1)]}`;
+  // Update pill
+  const pill=document.querySelector(`#pc-${pid} .path-pill`);
+  if(pill) pill.textContent=P.levels[level];
+}
+
+// ── DISCOVER / UNDO ───────────────────
+function discoverRoom(roomId,pid,xp,el){
+  if(state.discovered[roomId])return;
+  state.discovered[roomId]=true;
+  state.pathXP[pid]=(state.pathXP[pid]||0)+xp;
+  const row=document.getElementById('rr-'+roomId);
+  const dot=document.getElementById('rd-'+roomId);
+  if(dot)dot.textContent='✓';
+  if(row){
+    row.classList.add('done');
+    // Update sub text to show undo
+    const sub=row.querySelector('.r-sub');
+    if(sub)sub.innerHTML=`<span style="color:#9aaa9a">+${xp} xp</span><span style="color:#9aaa9a;font-size:10px"> · tap to undo</span>`;
+    // Change click to undo
+    row.onclick=(e)=>{e.stopPropagation();undoRoom(roomId,pid,xp,row);};
+  }
+  floatXP(el,xp);
+  const P=PATHS[pid];
+  const room=P.rooms.find(r=>r.id===roomId);
+  addLogEntry({type:'discovery',icon:P.icon,text:`Discovered: ${room?room.text:'a new room'}`,region:REGIONS[P.regionId].name,path:P.name,xp});
+  updatePathHeader(pid);
+  checkLevelUp(pid);
+  saveState();
+  renderChips();
+}
+
+function undoRoom(roomId,pid,xp,el){
+  if(!state.discovered[roomId])return;
+  delete state.discovered[roomId];
+  state.pathXP[pid]=Math.max(0,(state.pathXP[pid]||0)-xp);
+  const row=document.getElementById('rr-'+roomId)||el;
+  const dot=document.getElementById('rd-'+roomId);
+  if(dot)dot.textContent='';
+  if(row){
+    row.classList.remove('done');
+    const sub=row.querySelector('.r-sub');
+    const P=PATHS[pid];
+    const room=P.rooms.find(r=>r.id===roomId);
+    if(sub)sub.innerHTML=`${room&&room.type==='rare'?'Rare · ':''}+${xp} xp`;
+    row.onclick=(e)=>{e.stopPropagation();discoverRoom(roomId,pid,xp,row);};
+  }
+  updatePathHeader(pid);
+  saveState();
+  renderChips();
+}
+
+// ── TROPHIES ─────────────────────────
+let pendingTrophyId=null,pendingTrophyPid=null;
+function openTrophy(roomId,pid){
+  const P=PATHS[pid];
+  const room=P.rooms.find(r=>r.id===roomId);
+  if(!room)return;
+  pendingTrophyId=roomId;pendingTrophyPid=pid;
+  document.getElementById('ov-t-icon').textContent=room.icon||'🏆';
+  document.getElementById('ov-t-title').textContent=room.text;
+  document.getElementById('ov-t-text').textContent=room.ceremony||'This is yours.';
+  document.getElementById('ov-trophy').classList.add('show');
+}
+function claimTrophy(){
+  spawnConfetti('conf-trophy');
+  if(pendingTrophyId&&!state.trophies[pendingTrophyId]){
+    state.trophies[pendingTrophyId]=true;
+    if(!state.discovered[pendingTrophyId]){
+      state.discovered[pendingTrophyId]=true;
+      const P=PATHS[pendingTrophyPid];
+      const room=P.rooms.find(r=>r.id===pendingTrophyId);
+      state.pathXP[pendingTrophyPid]=(state.pathXP[pendingTrophyPid]||0)+(room?room.xp:10);
+      addLogEntry({type:'trophy',icon:'🏆',text:`Trophy claimed: ${room?room.text:''}`,region:REGIONS[P.regionId].name,path:P.name});
+      // Update dot in room row
+      const dot=document.getElementById('rd-'+pendingTrophyId);
+      if(dot)dot.textContent='★';
+      updatePathHeader(pendingTrophyPid);
+      saveState();renderChips();renderTrophyShelf();
+    }
+  }
+  // Auto-close after confetti
+  setTimeout(()=>closeOverlay('ov-trophy'),1800);
+}
+
+// ── LEVEL UP ──────────────────────────
+let pendingLevelPid=null;
+function checkLevelUp(pid){
+  const P=PATHS[pid];const xp=state.pathXP[pid]||0;const level=state.pathLevel[pid]||0;
+  if(xp>=P.maxXp&&level<P.levels.length-1){
+    // Re-render just the rooms area to show banner
+    const pr=document.getElementById('pr-'+pid);
+    if(pr)pr.innerHTML=renderRooms(P)+`<div class="lv-banner" onclick="event.stopPropagation();openLevelUp('${pid}')">
+      <span class="lv-banner-ico">🌸</span>
+      <div class="lv-banner-text">
+        <div class="lv-banner-eye">Ready to level up</div>
+        <div class="lv-banner-title">${P.name}</div>
+        <div class="lv-banner-sub">${P.levels[level]} → ${P.levels[level+1]} · tap to claim</div>
+      </div><span style="font-size:16px;color:#5a9a6a">→</span>
+    </div>${P.hasEmergency?renderEmergency(P):''}`;
+  }
+}
+function openLevelUp(pid){
+  const P=PATHS[pid];const level=state.pathLevel[pid]||0;
+  pendingLevelPid=pid;
+  document.getElementById('ov-lv-icon').textContent=P.icon;
+  document.getElementById('ov-lv-title').textContent=P.name;
+  const fromEl=document.getElementById('ov-lv-from');
+  fromEl.textContent=P.levels[level];fromEl.style.background=P.bgColor;fromEl.style.color=P.textColor;
+  document.getElementById('ov-lv-to').textContent=P.levels[level+1];
+  document.getElementById('ov-lv-text').textContent=P.levelDesc?P.levelDesc[level+1]:'Something has shifted.';
+  document.getElementById('ov-levelup').classList.add('show');
+  spawnConfetti('conf-levelup');
+}
+function claimLevelUp(){
+  if(pendingLevelPid){
+    state.pathLevel[pendingLevelPid]=(state.pathLevel[pendingLevelPid]||0)+1;
+    const P=PATHS[pendingLevelPid];const newLevel=state.pathLevel[pendingLevelPid];
+    addLogEntry({type:'levelup',icon:'🌸',text:`Level Up: ${P.name} → ${P.levels[newLevel]}`,region:REGIONS[P.regionId].name,path:P.name});
+    saveState();
+    if(currentRegionId)renderRegion(currentRegionId);
+    renderGarden();renderChips();
+  }
+  closeOverlay('ov-levelup');
+}
+
+// ── CHIPS ────────────────────────────
+function regionXP(id){
+  const R=REGIONS[id];if(!R)return 0;
+  return R.paths.reduce((s,pid)=>s+(state.pathXP[pid]||0),0);
+}
+function renderChips(){
+  const items=[
+    {id:'creative',icon:'🎨',name:'Creative Life',glow:'#e84a8a',lvlC:'#3a7a3a',bar:'linear-gradient(90deg,#5a9a6a,#3a7a4a)',maxXp:100},
+    {id:'body',icon:'🌿',name:'Body',glow:'#4a8ae8',lvlC:'#2a6a8a',bar:'linear-gradient(90deg,#4a9aaa,#2a6a8a)',maxXp:100},
+    {id:'mind',icon:'🧠',name:'Mind',glow:'#5a9a6a',lvlC:'#3a7a4a',bar:'linear-gradient(90deg,#5a9a7a,#3a7a4a)',maxXp:100},
+    {id:'nourishment',icon:'🌱',name:'Nourishment',glow:'#6aaa4a',lvlC:'#4a8a2a',bar:'linear-gradient(90deg,#7aaa5a,#4a8a2a)',maxXp:100},
+    {id:'connection',icon:'🤝',name:'Connection',glow:'#e87a4a',lvlC:'#8a3a2a',bar:'linear-gradient(90deg,#c87a5a,#8a3a2a)',maxXp:100}
+  ];
+  document.getElementById('region-chips').innerHTML=items.map(r=>{
+    const R=REGIONS[r.id];
+    const xp=regionXP(r.id);
+    const pct=Math.min(100,Math.round(xp/r.maxXp*100));
+    const lvlXp=R?R.paths.reduce((s,pid)=>s+(state.pathXP[pid]||0),0):0;
+    const lvlName=R?R.levels[lvlXp<10?0:lvlXp<30?1:lvlXp<60?2:3]:'-';
+    return `<div class="r-chip lit" onclick="goScreen('region-screen','${r.id}')">
+      <div class="chip-glow" style="background:${r.glow}"></div>
+      <span class="chip-ico">${r.icon}</span>
+      <div class="chip-name">${r.name}</div>
+      <div class="chip-lvl" style="color:${r.lvlC}">${lvlName}</div>
+      <div class="chip-bar"><div class="chip-bar-fill" style="width:${pct}%;background:${r.bar}"></div></div>
+    </div>`;
+  }).join('');
+}
+
+// ── MAP ───────────────────────────────
+function renderMapLegend(){
+  const items=[
+    {id:'creative',icon:'🎨',bg:'#e8f4ec',name:'Creative Life',bar:'linear-gradient(90deg,#5a9a6a,#3a7a4a)',maxXp:100},
+    {id:'body',icon:'🌿',bg:'#e4f0f8',name:'Body',bar:'linear-gradient(90deg,#4a9aaa,#2a6a8a)',maxXp:100},
+    {id:'mind',icon:'🧠',bg:'#e4f0ec',name:'Mind',bar:'linear-gradient(90deg,#5a9a7a,#3a7a4a)',maxXp:100},
+    {id:'nourishment',icon:'🌱',bg:'#ecf4e0',name:'Nourishment',bar:'linear-gradient(90deg,#7aaa5a,#4a8a2a)',maxXp:100},
+    {id:'connection',icon:'🤝',bg:'#f8ede4',name:'Connection',bar:'linear-gradient(90deg,#c87a5a,#8a3a2a)',maxXp:100}
+  ];
+  document.getElementById('map-legend').innerHTML=items.map(i=>{
+    const R=REGIONS[i.id];
+    const pathCount=R?R.paths.length:0;
+    const xp=regionXP(i.id);const pct=Math.min(100,Math.round(xp/i.maxXp*100));
+    return `<div class="legend-row" onclick="goScreen('region-screen','${i.id}')">
+      <div class="legend-ico" style="background:${i.bg}">${i.icon}</div>
+      <div class="legend-info"><div class="legend-name">${i.name}</div><div class="legend-status">${pathCount} paths · tap to explore</div></div>
+      <div class="legend-bw"><div class="legend-bar"><div class="legend-bar-fill" style="width:${pct}%;background:${i.bar}"></div></div><div class="legend-pct">${pct}%</div></div>
+    </div>`;
+  }).join('');
+}
+
+function renderTrophyShelf(){
+  const allT=[];
+  Object.values(PATHS).forEach(P=>P.rooms.filter(r=>r.type==='trophy').forEach(r=>allT.push({...r,pid:P.id})));
+  document.getElementById('trophy-shelf-grid').innerHTML=allT.map(r=>{
+    const earned=!!state.trophies[r.id];
+    return `<div class="trophy-slot ${earned?'earned':'locked'}" onclick="${earned?`openTrophy('${r.id}','${r.pid}')`:''}" >
+      <div class="t-ico"><span>${r.icon||'🏆'}</span></div>
+      <div class="t-lbl">${r.text.split(' ').slice(0,4).join(' ')}</div>
+    </div>`;
+  }).join('');
+}
+
+function renderRefSections(){
+  const refs=[
+    {id:'ref-creative',icon:'🎨',title:'Creative Life',sub:'Principles · Levels · Philosophy',principle:'Nurture it like something growing, not manage it like something broken.',note:'Range of mediums is identity, not scattered hobbies. Drawing, watercolor, weaving, jewelry, music — these are all expressions of the same impulse. The seeking life, the personal practice, the inspiration collection, the education — these are all one thing.',levels:REGIONS.creative.levels,descs:REGIONS.creative.levelDesc,pillBg:['#f0f4f0','#e8f4ec','#d8eed8','#c4e4c4'],pillC:['#7a9a7a','#3a7a4a','#2a6a3a','#1a5a2a']},
+    {id:'ref-pp',icon:'🪴',title:'The Personal Practice',sub:'The nest · Two modes · Evenings',principle:'The container enables the abandon. Decide before you sit down so that once you\'re in, you can just be in.',note:'Two modes, fluid not separate: fundamentals when the well is quiet, expression when it\'s full. Evenings before bed. Longer weekend sessions as a different country. The prepared focus ritual — references pulled, intention set — is what makes the nest work.',levels:PATHS['personal-practice'].levels,descs:PATHS['personal-practice'].levelDesc,pillBg:['#f0f4f0','#e8f4ec','#d8eed8','#c4e4c4'],pillC:['#7a9a7a','#3a7a4a','#2a6a3a','#1a5a2a']},
+    {id:'ref-sl',icon:'🔭',title:'The Seeking Life',sub:'Beauty hunting · Aesthetic map · Cinema',principle:'Seek as seriously as you study. The input is not optional — it\'s half the work.',note:'You don\'t always find it in the right places. You find it in one piece, one film, one unexpected thing. Aesthetic anthropology: studying your own responses to build a personal map. Trusted voices — critics, curators, influencers whose taste you trust — matter more than community.',levels:PATHS['seeking-life'].levels,descs:PATHS['seeking-life'].levelDesc,pillBg:['#f0f4f0','#e8eef8','#d8e8f8','#c4d8f4'],pillC:['#7a9a7a','#2a5a8a','#1a4a7a','#1a3a6a']},
+    {id:'ref-ig',icon:'🗂️',title:'Inspiration Garden',sub:'Visual collection · Eight boards',principle:'The collection is only as good as how it feels to return to it. Build for the viewing experience, not just the saving.',note:'Eight boards: Faces & Figures · Color · Light & Shadow · Shapes · Nature · Jewelry · Crafts · Digital. Pinterest works for faces but the algorithm causes regression to the mean. Are, Milanote, or private Instagram as alternatives.',levels:PATHS['inspiration-garden'].levels,descs:PATHS['inspiration-garden'].levelDesc,pillBg:['#f0f4f0','#f8ece4','#f0e0d0','#e8d0bc'],pillC:['#7a9a7a','#7a4a2a','#6a3a1a','#5a2a0a']},
+    {id:'ref-ae',icon:'📚',title:'Aesthetic Education',sub:'Reading · Studying · Feeding the practice',principle:'Learning is part of the creative practice, not a break from it. Give it its own time so it doesn\'t steal from the making.',note:'To draw with abandon, you need to understand the framework it sits on. Structure enables freedom — the same as in dance. Sometimes learning applies immediately. Sometimes it marinates for weeks and arrives in the hand without warning.',levels:PATHS['aesthetic-education'].levels,descs:PATHS['aesthetic-education'].levelDesc,pillBg:['#f0f4f0','#f0e8f8','#e4d8f4','#d8c8f0'],pillC:['#7a9a7a','#6a4a8a','#5a3a7a','#4a2a6a']},
+    {id:'ref-body',icon:'🌿',title:'Body',sub:'Ignition · Consistency · Homecoming',principle:'Ignition first, consistency second. Your body came first — all of this came after.',note:'Ignition conditions: novelty, concrete goal, exciting partner. The body work isn\'t about fixing anything — it\'s homecoming. The animal ease is still there. You\'ve just been living mostly above the neck.',levels:REGIONS.body.levels,descs:REGIONS.body.levelDesc,pillBg:['#f0f4f0','#e4f0f8','#d0e8f4','#bcdfef'],pillC:['#7a9a7a','#2a6a8a','#1a5a7a','#1a4a6a']},
+    {id:'ref-ac',icon:'🥾',title:'Adventure & Capability',sub:'Boxing · Hiking with your son · Italy',principle:'Build the body that can do what you want to do. Capability is the point, not the means.',note:'The tango rare room is hidden until partner dance begins. Your son suggesting the next adventure is hidden until after the first hike is done. Italy is a cross-region thread that runs through Body, Connection, and Creative Life simultaneously.',levels:PATHS['adventure-capability'].levels,descs:PATHS['adventure-capability'].levelDesc,pillBg:['#f0f4f0','#e0ecf8','#ccdff4','#b8d2f0'],pillC:['#7a9a7a','#1a5a7a','#1a4a6a','#1a3a5a']},
+    {id:'ref-hb',icon:'🌊',title:'Honoring the Body',sub:'Morning · Afternoon · Evening · Sleep',principle:'This is homecoming, not fixing. The animal ease is still there — you\'ve just been living above it.',note:'Four returns: morning stretch, afternoon break away from the screen, evening release (let the day out of the body), sleep with intention. The body doesn\'t need to be managed — it needs to be visited.',levels:PATHS['honoring-body'].levels,descs:PATHS['honoring-body'].levelDesc,pillBg:['#f0f4f0','#e0f4f0','#ccece6','#b8e4dc'],pillC:['#7a9a7a','#1a6a5a','#1a5a4a','#1a4a3a']},
+    {id:'ref-je',icon:'💃',title:'Joy & Expression',sub:'African dance · Tango · The body as expression',principle:'The body knows how to do this. It just needs to be asked.',note:'African dance class identified, not yet attended. Tango on the horizon. Music runs through dance and community rather than Creative Life. The goal is not performance — it\'s abandoned in the best sense.',levels:PATHS['joy-expression'].levels,descs:PATHS['joy-expression'].levelDesc,pillBg:['#f0f4f0','#f8e4ee','#f0d4e4','#e8c4d8'],pillC:['#7a9a7a','#7a2a4a','#6a1a3a','#5a1a2a']},
+    {id:'ref-tf',icon:'🏗️',title:'The Foundation',sub:'Strength · Bone health · Heart · Longevity',principle:'This is the infrastructure. Not the point — what makes all the other things possible.',note:'Emergency Architecture is built into this path — the ADHD body has a particular relationship with collapse. One missed week becomes a story. The story becomes a truth. Having the architecture named before you need it means you can use it when you do.',levels:PATHS['the-foundation'].levels,descs:PATHS['the-foundation'].levelDesc,pillBg:['#f0f4f0','#ece8f8','#e0d8f4','#d4c8f0'],pillC:['#7a9a7a','#3a2a6a','#2a1a5a','#1a0a4a']},
+    {id:'ref-mind',icon:'🧠',title:'Mind',sub:'The hunger · The food · The web of connections',principle:'Keep the well full. Hunger is the signal, not the problem.',note:'When things are working, your mind is hungry and there is food everywhere. The world feels rich. When not: frantic unsatisfied hunger, doomscrolling, starting ideas in the middle. The paths are about tending conditions, not doing more.',levels:REGIONS.mind.levels,descs:REGIONS.mind.levelDesc,pillBg:['#f0f4f0','#e4f0ec','#d4e8e0','#c4e0d4'],pillC:['#7a9a7a','#2a5a4a','#1a4a3a','#1a3a2a']},
+    {id:'ref-rl',icon:'📖',title:'The Reading Life',sub:'Morning window · Evening window · Third book',principle:'The appetite is there, the books are there. You just need the containers protected.',note:'Morning for big thoughts, before bed for beautiful dreams. Three slots: heady/philosophical in the morning, emotional/beautiful at night, practical/skill in between. The lull protocol is the key — know what you reach for when you\'re between books so it doesn\'t become a black hole.',levels:PATHS['reading-life'].levels,descs:PATHS['reading-life'].levelDesc,pillBg:['#f0f4f0','#e4f0ec','#d4e8e0','#c4e0d4'],pillC:['#7a9a7a','#2a5a4a','#1a4a3a','#1a3a2a']},
+    {id:'ref-lc',icon:'🕸️',title:'The Living Curriculum',sub:'Nine threads · Follow what\'s alive · The web',principle:'You don\'t need a curriculum. You need a container for what the curriculum is becoming.',note:'Waiting map: Film & Visual Language · Anatomy & Technique · Music Theory · Psychology & the Inner Life · Philosophy, Archetypes & Storytelling · The Outdoors · Technology · Practical & Craft Skills · Italian (slow burn). Learning is fully associative. Risk isn\'t going too shallow — it\'s connections dissolving.',levels:PATHS['living-curriculum'].levels,descs:PATHS['living-curriculum'].levelDesc,pillBg:['#f0f4f0','#ecf4e4','#dcecd4','#cce4c4'],pillC:['#7a9a7a','#3a6a2a','#2a5a1a','#1a4a0a']},
+    {id:'ref-pa',icon:'🌿',title:'The Practice of Attention',sub:'Morning pages · Stillness · Noticing · Rest',principle:'Attention is a practice, not a trait. You cultivate it the same way you cultivate anything.',note:'This is the load-bearing path in Mind. When it\'s working, the other paths get easier and richer. Morning pages are thinking on paper — not making art, thinking out loud. Emergency Architecture is built in for when the conditions for attention collapse.',levels:PATHS['practice-attention'].levels,descs:PATHS['practice-attention'].levelDesc,pillBg:['#f0f4f0','#e8f0ec','#d8ece4','#c8e4dc'],pillC:['#7a9a7a','#2a4a3a','#1a3a2a','#1a2a1a']},
+    {id:'ref-nourishment',icon:'🌱',title:'Nourishment',sub:'Home · Food · Sensory life',principle:'Permissions, not plans.',note:'Already the strongest region. Home feels stable, welcoming, maintainable. Plants thriving. Eating healthily. This region is mostly about protecting what works and evolving it slowly and intentionally. The kitchen and outdoor space are the active projects.',levels:REGIONS.nourishment.levels,descs:REGIONS.nourishment.levelDesc,pillBg:['#f0f4f0','#ecf4e0','#dcecd0','#cce4c0'],pillC:['#7a9a7a','#3a6a1a','#2a5a0a','#1a4a00']},
+    {id:'ref-connection',icon:'🤝',title:'Connection',sub:'Your people · Gentle reach · Becoming',principle:'Use this time to become someone you\'d love to connect with. The rest follows.',note:'Connection is tender and still forming. Energy is spoken for — your son\'s recovery, your kids. Gentle reach at its lowest is answering a text. Becoming is the foundation layer: every other region is Connection work too.',levels:REGIONS.connection.levels,descs:REGIONS.connection.levelDesc,pillBg:['#f0f4f0','#f8ede4','#f0e0d0','#e8d0bc'],pillC:['#7a9a7a','#7a3a1a','#6a2a0a','#5a1a00']}
+  ];
+  document.getElementById('ref-sections').innerHTML=refs.map(r=>`
+    <div class="ref-section" id="${r.id}">
+      <div class="ref-toggle" onclick="toggleRef('${r.id}')">
+        <div class="ref-tl"><span class="ref-ti">${r.icon}</span><div><div class="ref-tt">${r.title}</div><div class="ref-ts">${r.sub}</div></div></div>
+        <span class="ref-arrow">▾</span>
+      </div>
+      <div class="ref-body">
+        <div class="ref-principle">${r.principle}</div>
+        ${r.note?`<div class="ref-note">${r.note}</div>`:''}
+        <div class="ref-lbl">Level Descriptions</div>
+        ${r.levels.map((l,i)=>`<div class="ref-level-row"><span class="ref-pill" style="background:${r.pillBg[i]};color:${r.pillC[i]}">${l}</span><div class="ref-level-text">${r.descs[i]}</div></div>`).join('')}
+      </div>
+    </div><div style="height:6px"></div>`).join('');
+}
+function toggleRef(id){document.getElementById(id)?.classList.toggle('open');}
+
+// ── QUEST ────────────────────────────
+let currentEnergy='medium',currentTime='quick';
+function renderQuest(){
+  const today=new Date();
+  const days=['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+  const months=['January','February','March','April','May','June','July','August','September','October','November','December'];
+  const dateStr=`${days[today.getDay()]} · ${months[today.getMonth()]} ${today.getDate()}`;
+  document.getElementById('home-date').textContent=dateStr;
+  document.getElementById('tq-date').textContent=`✦ ${dateStr}`;
+  const qi=today.getDate()%QUESTS.length;
+  const q=QUESTS[qi];
+  document.getElementById('quest-txt').textContent=q.txt;
+  document.getElementById('tq-txt').textContent=q.txt;
+  document.getElementById('quest-tag').textContent=q.tag;
+  document.getElementById('tq-tag').textContent=q.tag;
+  renderDoors();
+}
+
+function toggleE(btn,type){
+  btn.parentElement.querySelectorAll('.e-btn').forEach(b=>b.classList.remove('on'));
+  btn.classList.add('on');
+  if(type==='energy')currentEnergy=btn.dataset.energy;
+  if(type==='time')currentTime=btn.dataset.time;
+  renderDoors();
+}
+
+function renderDoors(){
+  const energyOrder={low:0,medium:1,high:2};
+  const timeOrder={quick:0,hour:1,open:2};
+  const eLevel=energyOrder[currentEnergy]??1;
+  const tLevel=timeOrder[currentTime]??0;
+  // Strict: only show doors whose energy AND time fit within what's available
+  const filtered=OPEN_DOORS.filter(d=>{
+    const de=energyOrder[d.energy]??1;
+    const dt=timeOrder[d.time]??0;
+    return de<=eLevel && dt<=tLevel;
+  });
+  // If nothing matches (e.g. low energy + few mins and all items need more), show the 2 lowest-cost items anyway
+  const show=filtered.length>0 ? filtered.slice(0,6) : OPEN_DOORS.slice(0,2);
+  document.getElementById('open-doors').innerHTML=show.map(d=>`
+    <div class="door-card" onclick="goScreen('region-screen','${d.region}','${d.pid}','${d.rid}')">
+      <span class="door-ico">${d.ico}</span>
+      <div class="door-text"><div class="door-main">${d.main}</div><div class="door-path">${d.path} · ${REGIONS[d.region]?.name||d.region}</div></div>
+      <span class="door-badge ${d.badge}">${d.label}</span>
+    </div>`).join('');
+}
+
+// ── LOG ───────────────────────────────
+function addLogEntry(entry){
+  const e={...entry,date:new Date().toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'})};
+  state.log.unshift(e);
+  if(state.log.length>200)state.log=state.log.slice(0,200);
+  renderLog();
+}
+function saveReflection(){
+  const val=document.getElementById('log-input').value.trim();
+  if(!val)return;
+  const region=document.getElementById('log-region-sel').value;
+  const path=document.getElementById('log-path-sel').value;
+  addLogEntry({type:'reflection',icon:'✍️',text:'Reflection',region:region||undefined,path:path||undefined,note:val});
+  document.getElementById('log-input').value='';
+  saveState();
+}
+function renderLog(){
+  const entries=state.log;
+  const container=document.getElementById('log-entries');
+  if(!entries.length){
+    container.innerHTML=`<div class="log-empty"><div class="log-empty-ico">🌱</div><div class="log-empty-txt">Your record begins with the first thing you discover. Every room you find, every trophy you claim, every reflection you write — it lives here.</div></div>`;
+    return;
+  }
+  const typeLabels={discovery:'Room Discovered',trophy:'Trophy Claimed',levelup:'Level Up',reflection:'Reflection'};
+  container.innerHTML=entries.map(e=>`
+    <div class="log-entry">
+      <div class="log-entry-head">
+        <span class="log-entry-ico">${e.icon||'📝'}</span>
+        <div class="log-entry-meta">
+          <div class="log-entry-type">${typeLabels[e.type]||e.type}</div>
+          ${(e.region||e.path)?`<div class="log-entry-where">${[e.region,e.path].filter(Boolean).join(' · ')}</div>`:''}
+          <div class="log-entry-date">${e.date}</div>
+        </div>
+      </div>
+      <div class="log-entry-text">${e.text}</div>
+      ${e.note?`<div class="log-entry-note">${e.note}</div>`:''}
+    </div>`).join('');
+}
+
+// ── OVERLAYS ─────────────────────────
+function closeOverlay(id){document.getElementById(id).classList.remove('show');}
+function spawnConfetti(wid){
+  const w=document.getElementById(wid);if(!w)return;w.innerHTML='';
+  const cols=['#f5c4d8','#f5d78a','#c4e8d4','#c4d8f8','#f8d4c4','#d4f4d4','#f4d4f8','#ffd700'];
+  for(let i=0;i<38;i++){const p=document.createElement('div');p.className='cp';p.style.cssText=`left:${2+Math.random()*96}%;top:${5+Math.random()*28}%;background:${cols[i%cols.length]};animation-duration:${1.5+Math.random()*2}s;animation-delay:${Math.random()*0.5}s;width:${5+Math.random()*9}px;height:${5+Math.random()*9}px;border-radius:${Math.random()>.5?'50%':'3px'};position:absolute;`;w.appendChild(p);}
+}
+function floatXP(el,xp){
+  if(!el)return;
+  const rect=el.getBoundingClientRect();const phone=document.getElementById('phone').getBoundingClientRect();
+  const f=document.createElement('div');f.className='float-xp';f.textContent=`+${xp} xp`;
+  f.style.left=(rect.left-phone.left+50)+'px';f.style.top=(rect.top-phone.top-8)+'px';
+  document.getElementById('phone').appendChild(f);setTimeout(()=>f.remove(),2200);
+}
+
+function confirmClearData(){
+  if(!confirm('Clear all discoveries, trophies, log entries, and XP? This starts you completely fresh.')) return;
+  state={discovered:{},trophies:{},log:[],pathXP:{},pathLevel:{}};
+  Object.values(PATHS).forEach(p=>{state.pathXP[p.id]=0;state.pathLevel[p.id]=0;});
+  saveState();
+  renderLog();
+  renderGarden();
+  renderChips();
+  renderMapLegend();
+  renderTrophyShelf();
+  if(currentRegionId) renderRegion(currentRegionId);
+  alert('All clear. Fresh start.');
+}
+
+// ── INIT ──────────────────────────────
+window.addEventListener('DOMContentLoaded',()=>{
+  loadState();
+  renderGarden();
+  renderChips();
+  renderQuest();
+  renderMapLegend();
+  renderTrophyShelf();
+  renderRefSections();
+  renderLog();
+});
+</script>
+</div>
+</body>
+</html>
